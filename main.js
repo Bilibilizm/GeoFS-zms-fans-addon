@@ -2,7 +2,7 @@
   'use strict';
 
   // 加载JSON配置文件
-  const configUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/data.json';
+  const configUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/data.json';
 
   // 创建插件UI
   const pluginUI = document.createElement('div');
@@ -35,6 +35,7 @@
   // 更新内容
   const updateContent = document.createElement('div');
   updateContent.id = 'update-content';
+  updateContent.innerText = '正在加载更新内容...';
   updateContent.style.cssText = `
     font-size: 14px;
     margin-bottom: 20px;
@@ -86,6 +87,7 @@
   // 活动内容
   const activityContent = document.createElement('div');
   activityContent.id = 'activity-content';
+  activityContent.innerText = '正在加载活动内容...';
   activityContent.style.cssText = `
     font-size: 14px;
     margin: 15px 0;
@@ -106,6 +108,7 @@
   // 新视频内容
   const newVideoContent = document.createElement('div');
   newVideoContent.id = 'new-video-content';
+  newVideoContent.innerText = '正在加载新视频内容...';
   newVideoContent.style.cssText = `
     font-size: 14px;
     color: #666;
@@ -122,36 +125,71 @@
   document.body.appendChild(pluginUI);
 
   // 加载JSON数据并更新UI
-  fetch(configUrl)
-    .then((response) => response.json())
-    .then((data) => {
-      updateContent.innerText = data.updateContent;
-      activityContent.innerText = data.activityContent;
-      newVideoContent.innerText = data.newVideoContent;
+  function loadConfig(retryCount = 3) {
+    fetch(configUrl)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('网络响应不正常');
+        }
+        return response.json();
+      })
+      .then((data) => {
+        console.log('JSON 文件加载成功:', data);
 
-      // 更新会员列表
-      const membersList = document.getElementById('members-list');
-      data.members.forEach((member) => {
-        const memberItem = document.createElement('div');
-        memberItem.innerText = member.name;
-        membersList.appendChild(memberItem);
+        // 更新更新内容
+        updateContent.innerText = data.updateContent || '暂无更新内容';
+
+        // 更新活动内容
+        activityContent.innerText = data.activityContent || '暂无活动内容';
+
+        // 更新新视频内容
+        newVideoContent.innerText = data.newVideoContent || '暂无新视频';
+
+        // 更新会员列表
+        const membersList = document.getElementById('members-list');
+        if (data.members && data.members.length > 0) {
+          data.members.forEach((member) => {
+            const memberItem = document.createElement('div');
+            memberItem.innerText = member.name;
+            membersList.appendChild(memberItem);
+          });
+          const joinMessage = document.createElement('div');
+          joinMessage.innerText = '如要加入会员请私信zm添加！';
+          joinMessage.style.cssText = 'font-size: 12px; color: #888; margin-top: 10px;';
+          membersList.appendChild(joinMessage);
+        } else {
+          membersList.innerText = '暂无会员';
+        }
+
+        // 更新排行榜
+        const leaderboardList = document.getElementById('leaderboard-list');
+        if (data.leaderboard && data.leaderboard.length > 0) {
+          data.leaderboard
+            .sort((a, b) => b.score - a.score)
+            .forEach((member, index) => {
+              const leaderboardItem = document.createElement('div');
+              leaderboardItem.innerText = `${index + 1}. ${member.name} - 积分: ${member.score}`;
+              leaderboardList.appendChild(leaderboardItem);
+            });
+        } else {
+          leaderboardList.innerText = '暂无排行榜数据';
+        }
+      })
+      .catch((error) => {
+        console.error('JSON 文件加载失败:', error);
+        if (retryCount > 0) {
+          console.log(`Retrying... (${retryCount} attempts left)`);
+          setTimeout(() => loadConfig(retryCount - 1), 3000); // 3秒后重试
+        } else {
+          updateContent.innerText = '加载失败，请稍后重试！';
+          activityContent.innerText = '加载失败，请稍后重试！';
+          newVideoContent.innerText = '加载失败，请稍后重试！';
+        }
       });
-      const joinMessage = document.createElement('div');
-      joinMessage.innerText = '如要加入会员请私信zm添加！';
-      joinMessage.style.cssText = 'font-size: 12px; color: #888; margin-top: 10px;';
-      membersList.appendChild(joinMessage);
+  }
 
-      // 更新排行榜
-      const leaderboardList = document.getElementById('leaderboard-list');
-      data.leaderboard
-        .sort((a, b) => b.score - a.score)
-        .forEach((member, index) => {
-          const leaderboardItem = document.createElement('div');
-          leaderboardItem.innerText = `${index + 1}. ${member.name} - 积分: ${member.score}`;
-          leaderboardList.appendChild(leaderboardItem);
-        });
-    })
-    .catch((error) => console.error('Error loading JSON:', error));
+  // 初始化加载
+  loadConfig();
 
   // 打开和关闭模态框的逻辑
   document.getElementById('open-members').addEventListener('click', () => {
