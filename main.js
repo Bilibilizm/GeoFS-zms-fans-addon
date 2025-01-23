@@ -1,235 +1,221 @@
 (function () {
-    'use strict';
+  'use strict';
 
-    // 定义插件数据（通过 JSON 动态加载）
-    let pluginData = {
-        update: '',   
-        members: [],     
-        rankings: [], 
-        plugins: []    
-    };
+  // 加载JSON配置文件
+  const configUrl = 'https://your-github-repo-url/config.json'; // 替换为你的GitHub JSON文件URL
 
-    // 从 JSON 文件加载数据
-    fetch('https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/data.json') 
-        .then(response => response.json())
-        .then(data => {
-            pluginData = data;
-            initializePlugins(); 
-        })
-        .catch(error => console.error('加载数据失败:', error));
+  // 创建插件UI
+  const pluginUI = document.createElement('div');
+  pluginUI.id = 'plugin-ui';
+  pluginUI.style.cssText = `
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-family: Arial, sans-serif;
+    width: 300px;
+    z-index: 1000;
+  `;
 
-    // 创建集合插件主界面
-    const mainMenu = document.createElement('div');
-    mainMenu.style.position = 'fixed';
-    mainMenu.style.top = '20px';
-    mainMenu.style.right = '20px';
-    mainMenu.style.backgroundColor = '#f0f0f0';
-    mainMenu.style.padding = '20px';
-    mainMenu.style.border = '1px solid #ccc';
-    mainMenu.style.borderRadius = '10px';
-    mainMenu.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-    mainMenu.style.zIndex = '1000';
-    mainMenu.style.display = 'none';
-    mainMenu.style.fontFamily = 'Arial, sans-serif';
-    document.body.appendChild(mainMenu);
+  // 标题
+  const title = document.createElement('h1');
+  title.innerText = 'GeoFS-zm粉丝专属插件';
+  title.style.cssText = `
+    font-size: 18px;
+    margin: 0 0 15px 0;
+    color: #333;
+  `;
+  pluginUI.appendChild(title);
 
-    // 标题
-    const title = document.createElement('h2');
-    title.textContent = '集合插件';
-    title.style.marginTop = '0';
-    title.style.textAlign = 'center';
-    mainMenu.appendChild(title);
+  // 更新内容
+  const updateContent = document.createElement('div');
+  updateContent.id = 'update-content';
+  updateContent.style.cssText = `
+    font-size: 14px;
+    margin-bottom: 20px;
+    color: #666;
+  `;
+  pluginUI.appendChild(updateContent);
 
-    // 更新信息
-    const updateInfo = document.createElement('p');
-    updateInfo.style.textAlign = 'center';
-    updateInfo.style.color = '#666';
-    mainMenu.appendChild(updateInfo);
+  // 活动标题
+  const activityTitle = document.createElement('h2');
+  activityTitle.innerText = '活动';
+  activityTitle.style.cssText = `
+    font-size: 16px;
+    margin: 0 0 10px 0;
+    color: #333;
+  `;
+  pluginUI.appendChild(activityTitle);
 
-    // 创建按钮
-    const createButton = (text, onClick) => {
-        const button = document.createElement('button');
-        button.textContent = text;
-        button.style.width = '100%';
-        button.style.padding = '10px';
-        button.style.marginBottom = '10px';
-        button.style.backgroundColor = '#008CBA';
-        button.style.color = 'white';
-        button.style.border = 'none';
-        button.style.borderRadius = '5px';
-        button.style.cursor = 'pointer';
-        button.addEventListener('click', onClick);
-        return button;
-    };
+  // 会员按钮
+  const membersButton = document.createElement('button');
+  membersButton.id = 'open-members';
+  membersButton.innerText = '会员';
+  membersButton.style.cssText = `
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 10px;
+    font-size: 14px;
+  `;
+  pluginUI.appendChild(membersButton);
 
-    // 初始化插件
-    function initializePlugins() {
-        // 清空主界面
-        mainMenu.innerHTML = '';
-        mainMenu.appendChild(title);
+  // 排行榜按钮
+  const leaderboardButton = document.createElement('button');
+  leaderboardButton.id = 'open-leaderboard';
+  leaderboardButton.innerText = '排行榜';
+  leaderboardButton.style.cssText = `
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  `;
+  pluginUI.appendChild(leaderboardButton);
 
-        // 显示更新信息
-        updateInfo.textContent = pluginData.update || '暂无更新信息';
-        mainMenu.appendChild(updateInfo);
+  // 活动内容
+  const activityContent = document.createElement('div');
+  activityContent.id = 'activity-content';
+  activityContent.style.cssText = `
+    font-size: 14px;
+    margin: 15px 0;
+    color: #666;
+  `;
+  pluginUI.appendChild(activityContent);
 
-        // 会员列表按钮
-        if (pluginData.members && pluginData.members.length > 0) {
-            mainMenu.appendChild(createButton('会员列表', () => {
-                showMembers(pluginData.members);
-            }));
-        }
+  // 新视频标题
+  const newVideoTitle = document.createElement('h2');
+  newVideoTitle.innerText = '新视频';
+  newVideoTitle.style.cssText = `
+    font-size: 16px;
+    margin: 20px 0 10px 0;
+    color: #333;
+  `;
+  pluginUI.appendChild(newVideoTitle);
 
-        // 排行榜按钮
-        if (pluginData.rankings && pluginData.rankings.length > 0) {
-            mainMenu.appendChild(createButton('排行榜', () => {
-                showRankings(pluginData.rankings);
-            }));
-        }
+  // 新视频内容
+  const newVideoContent = document.createElement('div');
+  newVideoContent.id = 'new-video-content';
+  newVideoContent.style.cssText = `
+    font-size: 14px;
+    color: #666;
+  `;
+  pluginUI.appendChild(newVideoContent);
 
-        // 插件按钮
-        if (pluginData.plugins && pluginData.plugins.length > 0) {
-            mainMenu.appendChild(createButton('插件', () => {
-                showPlugins(pluginData.plugins);
-            }));
-        }
-    }
+  // 将会员列表和排行榜模态框添加到页面
+  const membersModal = createModal('members-modal', '会员列表');
+  const leaderboardModal = createModal('leaderboard-modal', '排行榜');
+  document.body.appendChild(membersModal);
+  document.body.appendChild(leaderboardModal);
 
-    // 按 K 键打开/关闭集合插件界面
-    document.addEventListener('keydown', (event) => {
-        if (event.key === 'k' || event.key === 'K') {
-            mainMenu.style.display = mainMenu.style.display === 'none' ? 'block' : 'none';
-        }
+  // 将插件UI添加到页面
+  document.body.appendChild(pluginUI);
+
+  // 加载JSON数据并更新UI
+  fetch(configUrl)
+    .then((response) => response.json())
+    .then((data) => {
+      updateContent.innerText = data.updateContent;
+      activityContent.innerText = data.activityContent;
+      newVideoContent.innerText = data.newVideoContent;
+
+      // 更新会员列表
+      const membersList = document.getElementById('members-list');
+      data.members.forEach((member) => {
+        const memberItem = document.createElement('div');
+        memberItem.innerText = member.name;
+        membersList.appendChild(memberItem);
+      });
+      const joinMessage = document.createElement('div');
+      joinMessage.innerText = '如要加入会员请私信zm添加！';
+      joinMessage.style.cssText = 'font-size: 12px; color: #888; margin-top: 10px;';
+      membersList.appendChild(joinMessage);
+
+      // 更新排行榜
+      const leaderboardList = document.getElementById('leaderboard-list');
+      data.leaderboard
+        .sort((a, b) => b.score - a.score)
+        .forEach((member, index) => {
+          const leaderboardItem = document.createElement('div');
+          leaderboardItem.innerText = `${index + 1}. ${member.name} - 积分: ${member.score}`;
+          leaderboardList.appendChild(leaderboardItem);
+        });
+    })
+    .catch((error) => console.error('Error loading JSON:', error));
+
+  // 打开和关闭模态框的逻辑
+  document.getElementById('open-members').addEventListener('click', () => {
+    document.getElementById('members-modal').style.display = 'block';
+  });
+
+  document.getElementById('open-leaderboard').addEventListener('click', () => {
+    document.getElementById('leaderboard-modal').style.display = 'block';
+  });
+
+  document.querySelectorAll('.close').forEach((button) => {
+    button.addEventListener('click', () => {
+      button.parentElement.parentElement.style.display = 'none';
     });
+  });
 
-    // 显示会员列表
-    function showMembers(data) {
-        const popup = document.createElement('div');
-        popup.style.position = 'fixed';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-        popup.style.padding = '20px';
-        popup.style.borderRadius = '10px';
-        popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-        popup.style.width = '400px';
-        popup.style.maxHeight = '80vh';
-        popup.style.overflowY = 'auto';
-        popup.style.zIndex = '1001';
+  // 创建模态框的函数
+  function createModal(id, title) {
+    const modal = document.createElement('div');
+    modal.id = id;
+    modal.style.cssText = `
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      width: 300px;
+      z-index: 1001;
+    `;
 
-        // 标题
-        const title = document.createElement('h3');
-        title.textContent = '会员列表';
-        popup.appendChild(title);
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = 'position: relative;';
 
-        // 内容
-        const content = document.createElement('div');
-        content.innerHTML = data.map(item => `<p>${item.name}</p>`).join('');
-        popup.appendChild(content);
+    const closeButton = document.createElement('span');
+    closeButton.className = 'close';
+    closeButton.innerText = '×';
+    closeButton.style.cssText = `
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #888;
+    `;
 
-        // 关闭按钮
-        const closeButton = document.createElement('button');
-        closeButton.textContent = '关闭';
-        closeButton.style.width = '100%';
-        closeButton.style.padding = '10px';
-        closeButton.style.backgroundColor = '#f44336';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '5px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.addEventListener('click', () => {
-            popup.remove();
-        });
-        popup.appendChild(closeButton);
+    const modalTitle = document.createElement('h2');
+    modalTitle.innerText = title;
+    modalTitle.style.cssText = `
+      font-size: 18px;
+      margin: 0 0 15px 0;
+      color: #333;
+    `;
 
-        document.body.appendChild(popup);
-    }
+    const content = document.createElement('div');
+    content.id = `${id}-list`;
+    content.style.cssText = 'font-size: 14px; color: #666;';
 
-    // 显示排行榜
-    function showRankings(data) {
-        const popup = document.createElement('div');
-        popup.style.position = 'fixed';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-        popup.style.padding = '20px';
-        popup.style.borderRadius = '10px';
-        popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-        popup.style.width = '400px';
-        popup.style.maxHeight = '80vh';
-        popup.style.overflowY = 'auto';
-        popup.style.zIndex = '1001';
+    modalContent.appendChild(closeButton);
+    modalContent.appendChild(modalTitle);
+    modalContent.appendChild(content);
+    modal.appendChild(modalContent);
 
-        // 标题
-        const title = document.createElement('h3');
-        title.textContent = '排行榜';
-        popup.appendChild(title);
-
-        // 内容
-        const content = document.createElement('div');
-        content.innerHTML = data.map(item => `<p>${item.name}: ${item.score}</p>`).join('');
-        popup.appendChild(content);
-
-        // 关闭按钮
-        const closeButton = document.createElement('button');
-        closeButton.textContent = '关闭';
-        closeButton.style.width = '100%';
-        closeButton.style.padding = '10px';
-        closeButton.style.backgroundColor = '#f44336';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '5px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.addEventListener('click', () => {
-            popup.remove();
-        });
-        popup.appendChild(closeButton);
-
-        document.body.appendChild(popup);
-    }
-
-    // 显示插件列表
-    function showPlugins(data) {
-        const popup = document.createElement('div');
-        popup.style.position = 'fixed';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-        popup.style.padding = '20px';
-        popup.style.borderRadius = '10px';
-        popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-        popup.style.width = '400px';
-        popup.style.maxHeight = '80vh';
-        popup.style.overflowY = 'auto';
-        popup.style.zIndex = '1001';
-
-        // 标题
-        const title = document.createElement('h3');
-        title.textContent = '插件列表';
-        popup.appendChild(title);
-
-        // 内容
-        const content = document.createElement('div');
-        content.innerHTML = data.map(item => `<p><a href="${item.url}" target="_blank">${item.name}</a></p>`).join('');
-        popup.appendChild(content);
-
-        // 关闭按钮
-        const closeButton = document.createElement('button');
-        closeButton.textContent = '关闭';
-        closeButton.style.width = '100%';
-        closeButton.style.padding = '10px';
-        closeButton.style.backgroundColor = '#f44336';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '5px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.addEventListener('click', () => {
-            popup.remove();
-        });
-        popup.appendChild(closeButton);
-
-        document.body.appendChild(popup);
-    }
+    return modal;
+  }
 })();
