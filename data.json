@@ -1,17 +1,11 @@
 {
-  "updateContent": "idk",
+  "updateContent": "666",
   "members": [
-    {"name": "zm"},
-    {"name": "Test2"},
-    {"name": "Test3"},
-    {"name": "Test4"}
+    {"name": "Test1"},
+    {"name": "Test2"}
   ],
   "leaderboard": [
-    {"name": "zm", "score": 99999},
-    {"name": "Test2", "score": 85},
-    {"name": "Test3", "score": 70},
-    {"name": "Test4", "score": 50}
-  ],
-  "activityContent": "What can I say",
-  "newVideoContent": "Mamba out"
+    {"name": "Test1", "score": 5},
+    {"name": "Test2", "score": 2}
+  ]
 }
