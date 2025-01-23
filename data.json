@@ -1,13 +1,17 @@
 {
-  "updateContent": "无",
+  "updateContent": "idk",
   "members": [
     {"name": "zm"},
-    {"name": "Kobe"}
+    {"name": "Test2"},
+    {"name": "Test3"},
+    {"name": "Test4"}
   ],
   "leaderboard": [
     {"name": "zm", "score": 99999},
-    {"name": "Kobe", "score": 24}
+    {"name": "Test2", "score": 85},
+    {"name": "Test3", "score": 70},
+    {"name": "Test4", "score": 50}
   ],
-  "activityContent": "nothing",
-  "newVideoContent": "还没有视频！"
+  "activityContent": "What can I say",
+  "newVideoContent": "Mamba out"
 }
