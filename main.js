@@ -2,7 +2,7 @@
   'use strict';
 
   // 加载JSON配置文件
-  const configUrl = 'https://your-github-repo-url/config.json'; // 替换为你的GitHub JSON文件URL
+  const configUrl = 'https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/data.json'; 
 
   // 创建插件UI
   const pluginUI = document.createElement('div');
