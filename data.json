@@ -1,0 +1,21 @@
+{
+  "update": "2025年1月23日更新：新增排行榜功能！",
+  "members": [
+    { "name": "Test1" },
+    { "name": "Test2" }
+  ],
+  "rankings": [
+    { "name": "Test1", "score": 5 },
+    { "name": "Test2", "score": 2 }
+  ],
+  "plugins": [
+    {
+      "name": "客舱广播",
+      "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/Cabin.js"
+    },
+    {
+      "name": "检查单",
+      "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/checklist.js"
+    }
+  ]
+}
