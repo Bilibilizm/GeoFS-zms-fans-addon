@@ -1,11 +1,11 @@
 {
   "update": "2025年1月23日更新：新增排行榜功能！",
   "members": [
-    { "name": "Test1" },
+    { "name": "zm" },
     { "name": "Test2" }
   ],
   "rankings": [
-    { "name": "Test1", "score": 5 },
+    { "name": "zm", "score": 99999999 },
     { "name": "Test2", "score": 2 }
   ],
   "plugins": [
