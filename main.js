@@ -2,7 +2,7 @@
   'use strict';
 
   // 加载JSON配置文件
-  const configUrl = 'https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/data.json'; 
+  const configUrl = 'https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/data.json';
 
   // 创建插件UI
   const pluginUI = document.createElement('div');
@@ -18,6 +18,8 @@
     font-family: Arial, sans-serif;
     width: 300px;
     z-index: 1000;
+    display: none; /* 默认隐藏 */
+    cursor: move; /* 拖动时显示移动光标 */
   `;
 
   // 标题
@@ -218,4 +220,34 @@
 
     return modal;
   }
+
+  // 实现界面拖动功能
+  let isDragging = false;
+  let offsetX, offsetY;
+
+  pluginUI.addEventListener('mousedown', (e) => {
+    if (e.target === pluginUI || e.target === title) {
+      isDragging = true;
+      offsetX = e.clientX - pluginUI.offsetLeft;
+      offsetY = e.clientY - pluginUI.offsetTop;
+    }
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (isDragging) {
+      pluginUI.style.left = `${e.clientX - offsetX}px`;
+      pluginUI.style.top = `${e.clientY - offsetY}px`;
+    }
+  });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+  });
+
+  // 实现K键打开/关闭界面
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'k' || e.key === 'K') {
+      pluginUI.style.display = pluginUI.style.display === 'none' ? 'block' : 'none';
+    }
+  });
 })();
