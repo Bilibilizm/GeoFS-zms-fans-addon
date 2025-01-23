@@ -10,7 +10,7 @@
     };
 
     // 从 JSON 文件加载数据
-    fetch('https://your-github-repo-url/data.json') 
+    fetch('https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/data.json') 
         .then(response => response.json())
         .then(data => {
             pluginData = data;
