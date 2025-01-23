@@ -140,21 +140,34 @@
 
         // 插件列表
         const pluginsList = document.getElementById("plugins-list");
-        pluginsList.innerHTML = data.plugins
-          .map((plugin) => `
-            <button onclick="loadScript('${plugin.url}')" style="display: block; width: 100%; padding: 5px 10px; margin-bottom: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
-              ${plugin.name}
-            </button>
-          `)
-          .join("");
+        if (data.plugins && data.plugins.length > 0 && data.plugins[0].plugins) {
+            pluginsList.innerHTML = data.plugins[0].plugins
+                .map((plugin) => `
+                    <button onclick="loadScript('${plugin.url}')" style="display: block; width: 100%; padding: 5px 10px; margin-bottom: 5px; background: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                        ${plugin.name}
+                    </button>
+                `)
+                .join("");
+        } else {
+            pluginsList.innerHTML = `<p style="color: red;">插件数据加载失败，请检查 JSON 文件结构。</p>`;
+        }
       })
-      .catch((error) => console.error("Error fetching JSON:", error));
+      .catch((error) => {
+        console.error("Error fetching JSON:", error);
+        document.getElementById("update-content").innerText = "加载失败，请检查网络连接或 JSON 文件路径。";
+      });
   }
 
   // 加载插件脚本
   function loadScript(url) {
     const script = document.createElement("script");
     script.src = url;
+    script.onload = () => {
+      console.log(`插件 ${url} 加载成功`);
+    };
+    script.onerror = () => {
+      console.error(`插件 ${url} 加载失败，请检查 URL 是否正确`);
+    };
     document.body.appendChild(script);
   }
 
