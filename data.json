@@ -11,22 +11,13 @@
   "plugins": [
 {
   "update": "2025年1月23日更新：新增插件集合功能！",
-  "plugins": [
+"plugins": [
     {
-      "name": "安全须知演示",
-      "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/sn.js"
-    },
-    {
-      "name": "音乐播放器",
-      "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/MusicPlayer.js"
-    },
-    {
-      "name": "检查单",
-      "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/Checklist.js"
-    },
-    {
-      "name": "客舱广播",
-      "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/Cabin.js"
+        "plugins": [
+            { "name": "安全须知演示", "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/sn.js" },
+            { "name": "音乐播放器", "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/MusicPlayer.js" },
+            { "name": "检查单", "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/Checklist.js" },
+            { "name": "客舱广播", "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/Cabin.js" }
+        ]
     }
-  ]
-}
+]
