@@ -1,291 +1,162 @@
 (function () {
-  'use strict';
+    'use strict';
 
-  // 加载JSON配置文件
-  const configUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/data.json';
+    // JSON 文件的 URL
+    const jsonUrl = "https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/data.json";
 
-  // 创建插件UI
-  const pluginUI = document.createElement('div');
-  pluginUI.id = 'plugin-ui';
-  pluginUI.style.cssText = `
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    font-family: Arial, sans-serif;
-    width: 300px;
-    z-index: 1000;
-    display: none; /* 默认隐藏 */
-    cursor: move; /* 拖动时显示移动光标 */
-  `;
+    // 创建插件界面
+    function createPluginUI(data) {
+        const container = document.createElement('div');
+        container.id = 'zm-plugin-container';
+        container.style.position = 'fixed';
+        container.style.top = '20px';
+        container.style.right = '20px';
+        container.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        container.style.color = 'white';
+        container.style.padding = '10px';
+        container.style.borderRadius = '10px';
+        container.style.zIndex = '1000';
+        container.style.width = '300px';
+        container.style.display = 'none';
 
-  // 标题
-  const title = document.createElement('h1');
-  title.innerText = 'GeoFS-zm粉丝专属插件';
-  title.style.cssText = `
-    font-size: 18px;
-    margin: 0 0 15px 0;
-    color: #333;
-  `;
-  pluginUI.appendChild(title);
+        // 更新内容
+        const updateContent = document.createElement('div');
+        updateContent.innerHTML = `<strong>更新内容：</strong><br>${data.updateContent}`;
+        container.appendChild(updateContent);
 
-  // 更新内容
-  const updateContent = document.createElement('div');
-  updateContent.id = 'update-content';
-  updateContent.innerText = '正在加载更新内容...';
-  updateContent.style.cssText = `
-    font-size: 14px;
-    margin-bottom: 20px;
-    color: #666;
-  `;
-  pluginUI.appendChild(updateContent);
+        // 活动标题
+        const activityTitle = document.createElement('div');
+        activityTitle.innerHTML = `<strong>活动</strong>`;
+        activityTitle.style.marginTop = '10px';
+        container.appendChild(activityTitle);
 
-  // 活动标题
-  const activityTitle = document.createElement('h2');
-  activityTitle.innerText = '活动';
-  activityTitle.style.cssText = `
-    font-size: 16px;
-    margin: 0 0 10px 0;
-    color: #333;
-  `;
-  pluginUI.appendChild(activityTitle);
+        // 会员按钮
+        const memberButton = document.createElement('button');
+        memberButton.innerText = '会员';
+        memberButton.style.marginRight = '10px';
+        memberButton.style.marginTop = '5px';
+        memberButton.style.padding = '5px 10px';
+        memberButton.style.backgroundColor = '#4CAF50';
+        memberButton.style.color = 'white';
+        memberButton.style.border = 'none';
+        memberButton.style.borderRadius = '5px';
+        memberButton.style.cursor = 'pointer';
+        memberButton.onclick = () => showMemberList(data.members);
+        container.appendChild(memberButton);
 
-  // 会员按钮
-  const membersButton = document.createElement('button');
-  membersButton.id = 'open-members';
-  membersButton.innerText = '会员';
-  membersButton.style.cssText = `
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-right: 10px;
-    font-size: 14px;
-  `;
-  pluginUI.appendChild(membersButton);
+        // 排行榜按钮
+        const leaderboardButton = document.createElement('button');
+        leaderboardButton.innerText = '排行榜';
+        leaderboardButton.style.marginTop = '5px';
+        leaderboardButton.style.padding = '5px 10px';
+        leaderboardButton.style.backgroundColor = '#008CBA';
+        leaderboardButton.style.color = 'white';
+        leaderboardButton.style.border = 'none';
+        leaderboardButton.style.borderRadius = '5px';
+        leaderboardButton.style.cursor = 'pointer';
+        leaderboardButton.onclick = () => showLeaderboard(data.leaderboard);
+        container.appendChild(leaderboardButton);
 
-  // 排行榜按钮
-  const leaderboardButton = document.createElement('button');
-  leaderboardButton.id = 'open-leaderboard';
-  leaderboardButton.innerText = '排行榜';
-  leaderboardButton.style.cssText = `
-    background: #28a745;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 14px;
-  `;
-  pluginUI.appendChild(leaderboardButton);
+        // 将容器添加到页面
+        document.body.appendChild(container);
 
-  // 活动内容
-  const activityContent = document.createElement('div');
-  activityContent.id = 'activity-content';
-  activityContent.innerText = '正在加载活动内容...';
-  activityContent.style.cssText = `
-    font-size: 14px;
-    margin: 15px 0;
-    color: #666;
-  `;
-  pluginUI.appendChild(activityContent);
+        // 监听按键 K 打开/关闭界面
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'k' || e.key === 'K') {
+                container.style.display = container.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    }
 
-  // 新视频标题
-  const newVideoTitle = document.createElement('h2');
-  newVideoTitle.innerText = '新视频';
-  newVideoTitle.style.cssText = `
-    font-size: 16px;
-    margin: 20px 0 10px 0;
-    color: #333;
-  `;
-  pluginUI.appendChild(newVideoTitle);
+    // 显示会员列表
+    function showMemberList(members) {
+        const memberListContainer = document.createElement('div');
+        memberListContainer.style.position = 'fixed';
+        memberListContainer.style.top = '50%';
+        memberListContainer.style.left = '50%';
+        memberListContainer.style.transform = 'translate(-50%, -50%)';
+        memberListContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        memberListContainer.style.color = 'white';
+        memberListContainer.style.padding = '20px';
+        memberListContainer.style.borderRadius = '10px';
+        memberListContainer.style.zIndex = '1001';
+        memberListContainer.style.width = '300px';
 
-  // 新视频内容
-  const newVideoContent = document.createElement('div');
-  newVideoContent.id = 'new-video-content';
-  newVideoContent.innerText = '正在加载新视频内容...';
-  newVideoContent.style.cssText = `
-    font-size: 14px;
-    color: #666;
-  `;
-  pluginUI.appendChild(newVideoContent);
+        // 关闭按钮
+        const closeButton = document.createElement('button');
+        closeButton.innerText = '×';
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '10px';
+        closeButton.style.right = '10px';
+        closeButton.style.backgroundColor = 'transparent';
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.cursor = 'pointer';
+        closeButton.onclick = () => document.body.removeChild(memberListContainer);
+        memberListContainer.appendChild(closeButton);
 
-  // 将会员列表和排行榜模态框添加到页面
-  const membersModal = createModal('members-modal', '会员列表');
-  const leaderboardModal = createModal('leaderboard-modal', '排行榜');
-  document.body.appendChild(membersModal);
-  document.body.appendChild(leaderboardModal);
+        // 会员列表
+        const memberList = document.createElement('div');
+        memberList.innerHTML = `<strong>会员列表：</strong><br>`;
+        members.forEach(member => {
+            memberList.innerHTML += `${member.name}<br>`;
+        });
+        memberList.innerHTML += `<small>如要加入会员请私信 zm 添加！</small>`;
+        memberListContainer.appendChild(memberList);
 
-  // 将插件UI添加到页面
-  document.body.appendChild(pluginUI);
+        // 添加到页面
+        document.body.appendChild(memberListContainer);
+    }
 
-  // 加载JSON数据并更新UI
-  function loadConfig(retryCount = 3) {
-    fetch(configUrl)
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error('网络响应不正常');
+    // 显示排行榜
+    function showLeaderboard(leaderboard) {
+        const leaderboardContainer = document.createElement('div');
+        leaderboardContainer.style.position = 'fixed';
+        leaderboardContainer.style.top = '50%';
+        leaderboardContainer.style.left = '50%';
+        leaderboardContainer.style.transform = 'translate(-50%, -50%)';
+        leaderboardContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        leaderboardContainer.style.color = 'white';
+        leaderboardContainer.style.padding = '20px';
+        leaderboardContainer.style.borderRadius = '10px';
+        leaderboardContainer.style.zIndex = '1001';
+        leaderboardContainer.style.width = '300px';
+
+        // 关闭按钮
+        const closeButton = document.createElement('button');
+        closeButton.innerText = '×';
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '10px';
+        closeButton.style.right = '10px';
+        closeButton.style.backgroundColor = 'transparent';
+        closeButton.style.color = 'white';
+        closeButton.style.border = 'none';
+        closeButton.style.cursor = 'pointer';
+        closeButton.onclick = () => document.body.removeChild(leaderboardContainer);
+        leaderboardContainer.appendChild(closeButton);
+
+        // 排行榜内容
+        const leaderboardContent = document.createElement('div');
+        leaderboardContent.innerHTML = `<strong>排行榜：</strong><br>`;
+        leaderboard.sort((a, b) => b.score - a.score).forEach((member, index) => {
+            leaderboardContent.innerHTML += `${index + 1}. ${member.name} - ${member.score} 分<br>`;
+        });
+        leaderboardContainer.appendChild(leaderboardContent);
+
+        // 添加到页面
+        document.body.appendChild(leaderboardContainer);
+    }
+
+    // 加载 JSON 数据
+    GM_xmlhttpRequest({
+        method: 'GET',
+        url: jsonUrl,
+        onload: function (response) {
+            const data = JSON.parse(response.responseText);
+            createPluginUI(data);
+        },
+        onerror: function (error) {
+            console.error('加载 JSON 文件失败:', error);
         }
-        return response.json();
-      })
-      .then((data) => {
-        console.log('JSON 文件加载成功:', data);
-
-        // 更新更新内容
-        updateContent.innerText = data.updateContent || '暂无更新内容';
-
-        // 更新活动内容
-        activityContent.innerText = data.activityContent || '暂无活动内容';
-
-        // 更新新视频内容
-        newVideoContent.innerText = data.newVideoContent || '暂无新视频';
-
-        // 更新会员列表
-        const membersList = document.getElementById('members-list');
-        if (data.members && data.members.length > 0) {
-          data.members.forEach((member) => {
-            const memberItem = document.createElement('div');
-            memberItem.innerText = member.name;
-            membersList.appendChild(memberItem);
-          });
-          const joinMessage = document.createElement('div');
-          joinMessage.innerText = '如要加入会员请私信zm添加！';
-          joinMessage.style.cssText = 'font-size: 12px; color: #888; margin-top: 10px;';
-          membersList.appendChild(joinMessage);
-        } else {
-          membersList.innerText = '暂无会员';
-        }
-
-        // 更新排行榜
-        const leaderboardList = document.getElementById('leaderboard-list');
-        if (data.leaderboard && data.leaderboard.length > 0) {
-          data.leaderboard
-            .sort((a, b) => b.score - a.score)
-            .forEach((member, index) => {
-              const leaderboardItem = document.createElement('div');
-              leaderboardItem.innerText = `${index + 1}. ${member.name} - 积分: ${member.score}`;
-              leaderboardList.appendChild(leaderboardItem);
-            });
-        } else {
-          leaderboardList.innerText = '暂无排行榜数据';
-        }
-      })
-      .catch((error) => {
-        console.error('JSON 文件加载失败:', error);
-        if (retryCount > 0) {
-          console.log(`Retrying... (${retryCount} attempts left)`);
-          setTimeout(() => loadConfig(retryCount - 1), 3000); // 3秒后重试
-        } else {
-          updateContent.innerText = '加载失败，请稍后重试！';
-          activityContent.innerText = '加载失败，请稍后重试！';
-          newVideoContent.innerText = '加载失败，请稍后重试！';
-        }
-      });
-  }
-
-  // 初始化加载
-  loadConfig();
-
-  // 打开和关闭模态框的逻辑
-  document.getElementById('open-members').addEventListener('click', () => {
-    document.getElementById('members-modal').style.display = 'block';
-  });
-
-  document.getElementById('open-leaderboard').addEventListener('click', () => {
-    document.getElementById('leaderboard-modal').style.display = 'block';
-  });
-
-  document.querySelectorAll('.close').forEach((button) => {
-    button.addEventListener('click', () => {
-      button.parentElement.parentElement.style.display = 'none';
     });
-  });
-
-  // 创建模态框的函数
-  function createModal(id, title) {
-    const modal = document.createElement('div');
-    modal.id = id;
-    modal.style.cssText = `
-      display: none;
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      width: 300px;
-      z-index: 1001;
-    `;
-
-    const modalContent = document.createElement('div');
-    modalContent.style.cssText = 'position: relative;';
-
-    const closeButton = document.createElement('span');
-    closeButton.className = 'close';
-    closeButton.innerText = '×';
-    closeButton.style.cssText = `
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      font-size: 24px;
-      cursor: pointer;
-      color: #888;
-    `;
-
-    const modalTitle = document.createElement('h2');
-    modalTitle.innerText = title;
-    modalTitle.style.cssText = `
-      font-size: 18px;
-      margin: 0 0 15px 0;
-      color: #333;
-    `;
-
-    const content = document.createElement('div');
-    content.id = `${id}-list`;
-    content.style.cssText = 'font-size: 14px; color: #666;';
-
-    modalContent.appendChild(closeButton);
-    modalContent.appendChild(modalTitle);
-    modalContent.appendChild(content);
-    modal.appendChild(modalContent);
-
-    return modal;
-  }
-
-  // 实现界面拖动功能
-  let isDragging = false;
-  let offsetX, offsetY;
-
-  pluginUI.addEventListener('mousedown', (e) => {
-    if (e.target === pluginUI || e.target === title) {
-      isDragging = true;
-      offsetX = e.clientX - pluginUI.offsetLeft;
-      offsetY = e.clientY - pluginUI.offsetTop;
-    }
-  });
-
-  document.addEventListener('mousemove', (e) => {
-    if (isDragging) {
-      pluginUI.style.left = `${e.clientX - offsetX}px`;
-      pluginUI.style.top = `${e.clientY - offsetY}px`;
-    }
-  });
-
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
-  });
-
-  // 实现K键打开/关闭界面
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'k' || e.key === 'K') {
-      pluginUI.style.display = pluginUI.style.display === 'none' ? 'block' : 'none';
-    }
-  });
 })();
