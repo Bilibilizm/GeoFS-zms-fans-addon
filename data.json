@@ -1,12 +1,12 @@
 {
-  "updateContent": "最新更新：增加了新的会员功能和排行榜！",
+  "updateContent": "无",
   "members": [
-    {"name": "Test1"},
-    {"name": "Test2"}
+    {"name": "zm"},
+    {"name": "Kobe"}
   ],
   "leaderboard": [
-    {"name": "Test1", "score": 5},
-    {"name": "Test2", "score": 2}
+    {"name": "zm", "score": 99999},
+    {"name": "Kobe", "score": 24}
   ],
   "activityContent": "nothing",
   "newVideoContent": "还没有视频！"
