@@ -1,3 +1,15 @@
+
+// ==UserScript==
+// @name         GeoFS Flight Inspection Checklist
+// @namespace    http://tampermonkey.net/
+// @version      1.2
+// @description  Thanks for useing.Good Flight!
+// @author       zm
+// @match        https://www.geo-fs.com/geofs.php?v=3.9
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=geo-fs.com
+// @grant        none
+// ==/UserScript==
+
 (function () {
     'use strict';
 
@@ -14,6 +26,30 @@
             '进近': ['襟翼....................按需放下', '起落架...................放下', '扰流板...................预位'],
             '着陆后': ['反推....................关', '襟翼....................收上', '扰流板...................压下'],
             '关车': ['停留刹车................开', '两个引擎................关', '舱门....................开']
+        },
+        'zh-TW': {
+            '準備': ['飛行計劃................導入', '高度速度................輸入'],
+            '推出前': ['停留剎車................提起', '艙門....................關閉'],
+            '推出後': ['停留剎車................放下'],
+            '滑行\\起飛前': ['兩個引擎................開', '襟翼....................起飛位', '安定面配平..............按需', '飛行操縱................檢查'],
+            '起飛後': ['起落架...................收起', '襟翼....................收起', '自動駕駛................接通'],
+            '巡航': ['自動駕駛儀..............檢查', 'FMC面板.................檢查'],
+            '下降': ['FMC面板.................檢查'],
+            '進近': ['襟翼....................按需放下', '起落架...................放下', '擾流板...................預位'],
+            '著陸後': ['反推....................關', '襟翼....................收起', '擾流板...................壓下'],
+            '關車': ['停留剎車................開', '兩個引擎................關', '艙門....................開']
+        },
+        'en': {
+            'Preparation': ['Flight Plan..............Import', 'Altitude/Speed..........Input'],
+            'Before Pushback': ['Parking Brake...........Set', 'Doors...................Close'],
+            'After Pushback': ['Parking Brake...........Release'],
+            'Taxi\\Before Takeoff': ['Engines.................Start', 'Flaps...................Takeoff Position', 'Stabilizer Trim..........As Required', 'Flight Controls..........Check'],
+            'After Takeoff': ['Landing Gear............Retract', 'Flaps...................Retract', 'Autopilot...............Engage'],
+            'Cruise': ['Autopilot...............Check', 'FMC Panel...............Check'],
+            'Descent': ['FMC Panel...............Check'],
+            'Approach': ['Flaps...................As Required', 'Landing Gear............Extend', 'Spoilers................ Arm'],
+            'After Landing': ['Thrust Reverser.........Disengage', 'Flaps...................Retract', 'Spoilers................Deploy'],
+            'Shutdown': ['Parking Brake...........Set', 'Engines.................Shutdown', 'Doors...................Open']
         }
     };
 
@@ -32,11 +68,36 @@
             unlockLabel: '菜单已解锁',
             versionLabel: '1.2 版本更新内容',
             versionContent: '1. 按钮改为 L 来打开关闭菜单\n2. 修复了已知 bug\n3. 新增锁定功能，按 Shift + L 解锁菜单'
+        },
+        'zh-TW': {
+            title: 'GeoFS 飛行檢查單',
+            author: '作者:  開飛機のzm',
+            opacityLabel: '透明度',
+            fontSizeLabel: '字體大小',
+            addItemLabel: '添加項目',
+            resetLabel: '重置',
+            resetConfirm: '你確認清除它們嗎？',
+            discordLink: '加入我們 Discord 群組',
+            lockLabel: '鎖定菜單',
+            unlockLabel: '菜單已解鎖',
+            versionLabel: '1.2 版本更新內容',
+            versionContent: '1. 按鈕改為 L 來打開關閉菜單\n2. 修復了已知 bug\n3. 新增鎖定功能，按 Shift + L 解鎖菜單'
+        },
+        'en': {
+            title: 'GeoFS Flight Checklist',
+            author: 'Author:  開飛機のzm',
+            opacityLabel: 'Opacity',
+            fontSizeLabel: 'Font Size',
+            addItemLabel: 'Add Item',
+            resetLabel: 'Reset',
+            resetConfirm: 'Are you sure you want to clear all?',
+            discordLink: 'Join our Discord group',
+            lockLabel: 'Lock Menu',
+            unlockLabel: 'Menu Unlocked',
+            versionLabel: '1.2 Version Update',
+            versionContent: '1. Changed button to L for opening/closing menu\n2. Fixed known bugs\n3. Added lock feature, press Shift + L to unlock menu'
         }
     };
-
-    // 当前语言
-    let currentLang = 'zh-CN';
 
     // 获取检查单数据
     function getChecklistData(lang) {
@@ -76,7 +137,6 @@
         menu.style.height = '500px';
         menu.style.overflowY = 'auto';
         menu.style.userSelect = 'none';
-        menu.style.display = 'none'; // 默认隐藏
 
         // 使菜单可拖动
         let isDragging = false;
@@ -114,6 +174,17 @@
         author.style.marginBottom = '10px';
         menu.appendChild(author);
 
+        // 语言切换
+        const languageSelect = document.createElement('select');
+        languageSelect.innerHTML = `
+            <option value="en">English</option>
+            <option value="zh-CN">简体中文</option>
+            <option value="zh-TW">繁體中文</option>
+        `;
+        languageSelect.value = currentLang;
+        languageSelect.style.marginBottom = '10px';
+        menu.appendChild(languageSelect);
+
         // 透明度调整
         const opacityLabel = document.createElement('p');
         opacityLabel.textContent = `${titles[currentLang].opacityLabel}: 100%`;
@@ -131,7 +202,7 @@
         opacitySlider.addEventListener('input', () => {
             const opacity = opacitySlider.value / 100;
             menu.style.backgroundColor = `rgba(255, 255, 255, ${opacity})`;
-            opacityLabel.textContent = `${titles[currentLang].opacityLabel}: ${opacitySlider.value}%`;
+            opacityLabel.textContent = `${titles[languageSelect.value].opacityLabel}: ${opacitySlider.value}%`;
         });
         menu.appendChild(opacitySlider);
 
@@ -151,7 +222,7 @@
         fontSizeSlider.style.marginBottom = '10px';
         fontSizeSlider.addEventListener('input', () => {
             menu.style.fontSize = `${fontSizeSlider.value}px`;
-            fontSizeLabel.textContent = `${titles[currentLang].fontSizeLabel}: ${fontSizeSlider.value}px`;
+            fontSizeLabel.textContent = `${titles[languageSelect.value].fontSizeLabel}: ${fontSizeSlider.value}px`;
         });
         menu.appendChild(fontSizeSlider);
 
@@ -172,8 +243,8 @@
         resetButton.style.borderRadius = '3px';
         resetButton.style.cursor = 'pointer';
         resetButton.addEventListener('click', () => {
-            if (confirm(titles[currentLang].resetConfirm)) {
-                const lang = currentLang;
+            if (confirm(titles[languageSelect.value].resetConfirm)) {
+                const lang = languageSelect.value;
                 localStorage.removeItem(`checklist_state_${lang}`);
                 updateChecklist(lang);
             }
@@ -219,7 +290,7 @@
         versionButton.style.borderRadius = '3px';
         versionButton.style.cursor = 'pointer';
         versionButton.addEventListener('click', () => {
-            showVersionPopup(currentLang);
+            showVersionPopup(languageSelect.value);
         });
         menu.appendChild(versionButton);
 
@@ -243,118 +314,187 @@
                     itemContainer.style.display = 'flex';
                     itemContainer.style.alignItems = 'center';
                     itemContainer.style.marginBottom = '5px';
+                    itemContainer.draggable = true;
 
                     // 打勾功能
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.style.marginRight = '10px';
-                    checkbox.checked = state[`${section}_${index}`] || false;
-                    checkbox.addEventListener('change', () => {
-                        state[`${section}_${index}`] = checkbox.checked;
+                    const checkbox = document.createElement('div');
+                    checkbox.style.width = '20px';
+                    checkbox.style.height = '20px';
+                    checkbox.style.border = '2px solid #333';
+                    checkbox.style.borderRadius = '3px';
+                    checkbox.style.cursor = 'pointer';
+                    checkbox.style.flexShrink = '0';
+                    checkbox.style.backgroundColor = state[`${section}_${index}`] ? 'blue' : 'transparent';
+                    checkbox.innerHTML = state[`${section}_${index}`] ? '&#10003;' : '';
+                    checkbox.style.color = 'white';
+                    checkbox.addEventListener('click', () => {
+                        state[`${section}_${index}`] = !state[`${section}_${index}`];
+                        checkbox.style.backgroundColor = state[`${section}_${index}`] ? 'blue' : 'transparent';
+                        checkbox.innerHTML = state[`${section}_${index}`] ? '&#10003;' : '';
                         saveChecklistState(lang, state);
                     });
                     itemContainer.appendChild(checkbox);
 
                     const itemText = document.createElement('span');
                     itemText.textContent = item;
+                    itemText.style.flexGrow = '1';
+                    itemText.style.marginLeft = '10px';
                     itemContainer.appendChild(itemText);
+
+                    // 删除按钮
+                    const deleteButton = document.createElement('button');
+                    deleteButton.textContent = '×';
+                    deleteButton.style.background = 'none';
+                    deleteButton.style.border = 'none';
+                    deleteButton.style.color = 'red';
+                    deleteButton.style.cursor = 'pointer';
+                    deleteButton.addEventListener('click', () => {
+                        items.splice(index, 1);
+                        saveChecklistData(lang, data);
+                        updateChecklist(lang);
+                    });
+                    itemContainer.appendChild(deleteButton);
 
                     sectionContainer.appendChild(itemContainer);
                 });
 
+                // 添加项目按钮
+                const addItemButton = document.createElement('button');
+                addItemButton.textContent = titles[lang].addItemLabel;
+                addItemButton.style.marginTop = '10px';
+                addItemButton.addEventListener('click', () => {
+                    const newItem = prompt(titles[lang].addItemLabel);
+                    if (newItem) {
+                        items.push(newItem);
+                        saveChecklistData(lang, data);
+                        updateChecklist(lang);
+                    }
+                });
+                sectionContainer.appendChild(addItemButton);
+
                 checklistContainer.appendChild(sectionContainer);
             }
+
+            // 更新标题、作者信息和标签
+            title.textContent = titles[lang].title;
+            author.textContent = titles[lang].author;
+            opacityLabel.textContent = `${titles[lang].opacityLabel}: ${opacitySlider.value}%`;
+            fontSizeLabel.textContent = `${titles[lang].fontSizeLabel}: ${fontSizeSlider.value}px`;
+            resetButton.textContent = titles[lang].resetLabel;
+            lockButton.textContent = titles[lang].lockLabel;
+            discordLink.innerHTML = `<a href="https://discord.gg/4dGHsNqgCH" target="_blank" style="color: blue; text-decoration: underline;">${titles[lang].discordLink}</a>`;
+            versionButton.textContent = titles[lang].versionLabel;
         }
 
         // 初始加载当前语言
         updateChecklist(currentLang);
 
+        // 语言切换事件
+        languageSelect.addEventListener('change', () => {
+            currentLang = languageSelect.value;
+            updateChecklist(currentLang);
+        });
+
         document.body.appendChild(menu);
         return menu;
     }
 
-    // 显示版本更新内容弹窗
-    function showVersionPopup(lang) {
-        const popup = document.createElement('div');
-        popup.style.position = 'fixed';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
-        popup.style.padding = '20px';
-        popup.style.borderRadius = '10px';
-        popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
-        popup.style.width = '400px';
-        popup.style.maxHeight = '80vh';
-        popup.style.overflowY = 'auto';
-        popup.style.fontFamily = 'Arial, sans-serif';
-        popup.style.color = '#333';
-        popup.style.zIndex = '1001';
+// 显示版本更新内容弹窗
+function showVersionPopup(lang) {
+    const popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = 'rgba(255, 255, 255, 0.95)';
+    popup.style.padding = '20px';
+    popup.style.borderRadius = '10px';
+    popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.2)';
+    popup.style.width = '400px';
+    popup.style.maxHeight = '80vh';
+    popup.style.overflowY = 'auto';
+    popup.style.fontFamily = 'Arial, sans-serif';
+    popup.style.color = '#333';
+    popup.style.zIndex = '1001';
 
-        // 弹窗标题
-        const popupTitle = document.createElement('h3');
-        popupTitle.textContent = titles[lang].versionLabel;
-        popupTitle.style.marginBottom = '10px';
-        popup.appendChild(popupTitle);
+    // 弹窗标题
+    const popupTitle = document.createElement('h3');
+    popupTitle.textContent = titles[lang].versionLabel;
+    popupTitle.style.marginBottom = '10px';
+    popup.appendChild(popupTitle);
 
-        // 弹窗内容
-        const popupContent = document.createElement('p');
-        popupContent.textContent = titles[lang].versionContent;
-        popupContent.style.whiteSpace = 'pre-line';
-        popup.appendChild(popupContent);
+    // 弹窗内容
+    const popupContent = document.createElement('p');
+    popupContent.textContent = titles[lang].versionContent;
+    popupContent.style.whiteSpace = 'pre-line'; 
+    popup.appendChild(popupContent);
 
-        // 关闭按钮
-        const closeButton = document.createElement('button');
-        closeButton.textContent = '关闭';
-        closeButton.style.marginTop = '10px';
-        closeButton.style.width = '100%';
-        closeButton.style.padding = '5px';
-        closeButton.style.backgroundColor = '#444';
-        closeButton.style.color = '#fff';
-        closeButton.style.border = 'none';
-        closeButton.style.borderRadius = '3px';
-        closeButton.style.cursor = 'pointer';
-        closeButton.addEventListener('click', () => {
-            popup.remove();
-            overlay.remove();
-        });
-        popup.appendChild(closeButton);
+    // 关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.textContent = titles[lang].resetLabel === '重置' ? '关闭' : 'Close';
+    closeButton.style.marginTop = '10px';
+    closeButton.style.width = '100%';
+    closeButton.style.padding = '5px';
+    closeButton.style.backgroundColor = '#444';
+    closeButton.style.color = '#fff';
+    closeButton.style.border = 'none';
+    closeButton.style.borderRadius = '3px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.addEventListener('click', () => {
+        popup.remove(); 
+        overlay.remove(); 
+    });
+    popup.appendChild(closeButton);
 
-        // 添加到页面
-        document.body.appendChild(popup);
+    // 添加到页面
+    document.body.appendChild(popup);
 
-        // 创建遮罩层
-        const overlay = document.createElement('div');
-        overlay.style.position = 'fixed';
-        overlay.style.top = '0';
-        overlay.style.left = '0';
-        overlay.style.width = '100%';
-        overlay.style.height = '100%';
-        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
-        overlay.style.zIndex = '1000';
-        overlay.addEventListener('click', () => {
-            popup.remove();
-            overlay.remove();
-        });
-        document.body.appendChild(overlay);
-    }
+    // 创建遮罩层
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+    overlay.style.zIndex = '1000'; 
+    overlay.addEventListener('click', () => {
+        popup.remove();
+        overlay.remove(); 
+    });
+    document.body.appendChild(overlay);
+}
+    // 通过 L 键打开/关闭菜单
+    let menu = null;
+    document.addEventListener('keydown', (e) => {
+        if ((e.key === 'L' || e.key === 'l') && !isLocked) {
+            if (menu) {
+                menu.remove();
+                menu = null;
+            } else {
+                menu = createMenu();
+            }
+        }
 
-    // 创建检查单按钮
-    const checklistButton = document.createElement('button');
-    checklistButton.innerText = '飞行检查单';
-    checklistButton.style.position = 'fixed';
-    checklistButton.style.bottom = '20px';
-    checklistButton.style.left = '20px';
-    checklistButton.style.backgroundColor = '#1DB954';
-    checklistButton.style.color = '#fff';
-    checklistButton.style.border = 'none';
-    checklistButton.style.borderRadius = '25px';
-    checklistButton.style.padding = '10px 20px';
-    checklistButton.style.cursor = 'pointer';
-    checklistButton.addEventListener('click', () => {
-        const menu = createMenu();
-        menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        // 通过 Shift + L 解锁菜单
+        if ((e.key === 'L' || e.key === 'l') && e.shiftKey) {
+            isLocked = false;
+            alert(titles[currentLang].unlockLabel);
+        }
     });
 
-    document.body.appendChild(checklistButton);
+    // 默认语言
+    let currentLang = 'en';
+
+    // 锁定状态
+    let isLocked = false;
+
+    // 初始化
+    (function init() {
+        // 检查是否有保存的语言设置
+        const savedLang = localStorage.getItem('checklist_lang');
+        if (savedLang) {
+            currentLang = savedLang;
+        }
+    })();
 })();
