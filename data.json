@@ -1,25 +1,24 @@
 {
-  "updateContent": "最新更新：新增检查单插件功能！",
-  "members": ["会员1", "会员2", "会员3"],
+  "updateContent": "What Can I say",
+  "members": ["zm", "Geo-VE", "一架刚出生的C919"],
   "leaderboard": [
     {
-      "name": "用户1",
+      "name": "zm",
       "avatar": "https://i.ibb.co/vB9T086/111.png",
-      "points": 100
+      "points": 99999999
     },
     {
-      "name": "用户2",
-      "avatar": "https://example.com/avatar2.png",
-      "points": 90
+      "name": "Geo-VE",
+      "avatar": "https://i.ibb.co/SJXWw7g/1-Y5-T08-A6-ZYBS91-PD-K-8-P50.jpg",
+      "points": 100
+    }
+    {
+      "name": "一架刚出生的C919",
+      "avatar": "https://i.ibb.co/x7PbZX4/BE-2-V-GNQ3-LWZBBDH0-V9-O5.jpg",
+      "points": 100
     }
   ],
-  "event": "当前活动：飞行挑战赛！",
-  "newVideo": "https://www.youtube.com/watch?v=example",
+  "event": "肘击",
+  "newVideo": "https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click",
   "plugins": [
-    {
-      "name": "检查单插件",
-      "description": "用于飞行前的检查单功能。",
-      "url": "https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/Checklist.js"
-    }
-  ]
 }
