@@ -1,6 +1,13 @@
 {
   "updateContent": "暂无",
-  "members": ["zm", "Geo-VE", "一架刚出生的C919", "星皓航空", "屑B-2445", "燮Yeff"],
+  "members": [
+    "zm",
+    "Geo-VE",
+    "一架刚出生的C919",
+    "星皓航空",
+    "屑B-2445",
+    "燮Yeff"
+  ],
   "leaderboard": [
     {
       "name": "zm",
@@ -35,5 +42,8 @@
   ],
   "event": "暂无",
   "newVideo": "https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click",
-  "plugins": []
+  "adContent": {
+    "version": "1.0",
+    "message": "欢迎使用 zm 粉丝专属插件！感谢您的支持！"
+  }
 }
