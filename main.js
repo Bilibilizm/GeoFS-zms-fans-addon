@@ -1,14 +1,40 @@
 (function () {
   'use strict';
 
-  let pluginContainer = null; 
-  let isPluginOpen = false; 
+  let pluginContainer = null; // 用于存储插件界面
+  let isPluginOpen = false; // 标记插件界面是否已打开
 
   // 动态加载 JSON 数据
   async function loadJSON() {
-    const response = await fetch('https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/data.json');
-    const data = await response.json();
-    return data;
+    try {
+      const response = await fetch('https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/data.json');
+      if (!response.ok) {
+        throw new Error('Failed to load JSON');
+      }
+      const data = await response.json();
+      console.log('JSON loaded successfully:', data);
+      return data;
+    } catch (error) {
+      console.error('Error loading JSON:', error);
+      return null;
+    }
+  }
+
+  // 处理排行榜数据：排序并处理相同积分的名次
+  function processLeaderboard(leaderboard) {
+    // 按积分从高到低排序
+    leaderboard.sort((a, b) => b.points - a.points);
+
+    // 处理相同积分的名次
+    let rank = 1;
+    for (let i = 0; i < leaderboard.length; i++) {
+      if (i > 0 && leaderboard[i].points < leaderboard[i - 1].points) {
+        rank = i + 1; // 更新名次
+      }
+      leaderboard[i].rank = rank; // 添加名次字段
+    }
+
+    return leaderboard;
   }
 
   // 创建可拖动的现代化弹出界面
@@ -92,11 +118,16 @@
 
   // 创建主插件界面
   async function createPluginUI(data) {
+    if (!data) {
+      console.error('No data provided');
+      return;
+    }
     if (pluginContainer) {
-      // 如果插件界面已存在，直接显示
+      console.log('Plugin container already exists');
       pluginContainer.style.display = 'block';
       return;
     }
+    console.log('Creating plugin container');
 
     pluginContainer = document.createElement('div');
     pluginContainer.style.position = 'fixed';
@@ -231,6 +262,9 @@
     videoLink.style.color = '#00a1d6';
     videoLink.target = '_blank';
 
+    // 处理排行榜数据
+    const processedLeaderboard = processLeaderboard(data.leaderboard);
+
     // 创建会员、排行榜、活动模态框
     const memberModal = createModal(
       '会员',
@@ -252,11 +286,11 @@
 
     const leaderboardModal = createModal(
       '排行榜',
-      data.leaderboard
+      processedLeaderboard
         .map(
-          (user, index) => `
+          (user) => `
           <div style="display: flex; align-items: center; margin-bottom: 10px; padding: 10px; background-color: #f5f5f5; border-radius: 5px;">
-            <span style="width: 30px; font-weight: bold;">${index + 1}</span>
+            <span style="width: 30px; font-weight: bold;">${user.rank}</span>
             <img src="${user.avatar}" alt="${user.name}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
             <div>
               <p style="margin: 0;">${user.name}</p>
@@ -310,20 +344,23 @@
   // 初始化插件
   async function initPlugin() {
     if (isPluginOpen) {
-      // 如果插件界面已打开，则关闭
+      console.log('Closing plugin');
       pluginContainer.style.display = 'none';
       isPluginOpen = false;
     } else {
-      // 如果插件界面未打开，则加载数据并显示
+      console.log('Opening plugin');
       const data = await loadJSON();
-      createPluginUI(data);
-      isPluginOpen = true;
+      if (data) {
+        createPluginUI(data);
+        isPluginOpen = true;
+      }
     }
   }
 
   // 监听按键 K 打开插件
   document.addEventListener('keydown', (event) => {
     if (event.key === 'k' || event.key === 'K') {
+      console.log('K key pressed');
       initPlugin();
     }
   });
