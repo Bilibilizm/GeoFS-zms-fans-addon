@@ -1,11 +1,10 @@
 {
-  "updateContent": "666",
-  "members": [
-    {"name": "Test1"},
-    {"name": "Test2"}
-  ],
+  "updateContent": "What can I say",
+  "members": ["zm", "Kobe"],
   "leaderboard": [
-    {"name": "Test1", "score": 5},
-    {"name": "Test2", "score": 2}
-  ]
+    {"name": "zm", "avatar": "https://i.ibb.co/Tm5ZxVt/image.png", "points": 100},
+    {"name": "Kobe", "avatar": "https://i.ibb.co/x89gGn8/SW.png", "points": 100}
+  ],
+  "event": "nothing",
+  "newVideo": "www.bilibili.com"
 }
