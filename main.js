@@ -1,162 +1,156 @@
 (function () {
-    'use strict';
+  'use strict';
 
-    // JSON 文件的 URL
-    const jsonUrl = "https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/data.json";
+  // 动态加载 JSON 数据
+  async function loadJSON() {
+    const response = await fetch('https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/data.json');
+    const data = await response.json();
+    return data;
+  }
 
-    // 创建插件界面
-    function createPluginUI(data) {
-        const container = document.createElement('div');
-        container.id = 'zm-plugin-container';
-        container.style.position = 'fixed';
-        container.style.top = '20px';
-        container.style.right = '20px';
-        container.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
-        container.style.color = 'white';
-        container.style.padding = '10px';
-        container.style.borderRadius = '10px';
-        container.style.zIndex = '1000';
-        container.style.width = '300px';
-        container.style.display = 'none';
+  // 创建插件界面
+  function createPluginUI(data) {
+    const container = document.createElement('div');
+    container.style.position = 'fixed';
+    container.style.top = '20px';
+    container.style.right = '20px';
+    container.style.backgroundColor = '#1e1e1e';
+    container.style.color = '#ffffff';
+    container.style.padding = '20px';
+    container.style.borderRadius = '10px';
+    container.style.zIndex = '10000';
+    container.style.fontFamily = 'Arial, sans-serif';
+    container.style.width = '300px';
+    container.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
 
-        // 更新内容
-        const updateContent = document.createElement('div');
-        updateContent.innerHTML = `<strong>更新内容：</strong><br>${data.updateContent}`;
-        container.appendChild(updateContent);
-
-        // 活动标题
-        const activityTitle = document.createElement('div');
-        activityTitle.innerHTML = `<strong>活动</strong>`;
-        activityTitle.style.marginTop = '10px';
-        container.appendChild(activityTitle);
-
-        // 会员按钮
-        const memberButton = document.createElement('button');
-        memberButton.innerText = '会员';
-        memberButton.style.marginRight = '10px';
-        memberButton.style.marginTop = '5px';
-        memberButton.style.padding = '5px 10px';
-        memberButton.style.backgroundColor = '#4CAF50';
-        memberButton.style.color = 'white';
-        memberButton.style.border = 'none';
-        memberButton.style.borderRadius = '5px';
-        memberButton.style.cursor = 'pointer';
-        memberButton.onclick = () => showMemberList(data.members);
-        container.appendChild(memberButton);
-
-        // 排行榜按钮
-        const leaderboardButton = document.createElement('button');
-        leaderboardButton.innerText = '排行榜';
-        leaderboardButton.style.marginTop = '5px';
-        leaderboardButton.style.padding = '5px 10px';
-        leaderboardButton.style.backgroundColor = '#008CBA';
-        leaderboardButton.style.color = 'white';
-        leaderboardButton.style.border = 'none';
-        leaderboardButton.style.borderRadius = '5px';
-        leaderboardButton.style.cursor = 'pointer';
-        leaderboardButton.onclick = () => showLeaderboard(data.leaderboard);
-        container.appendChild(leaderboardButton);
-
-        // 将容器添加到页面
-        document.body.appendChild(container);
-
-        // 监听按键 K 打开/关闭界面
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'k' || e.key === 'K') {
-                container.style.display = container.style.display === 'none' ? 'block' : 'none';
-            }
-        });
-    }
-
-    // 显示会员列表
-    function showMemberList(members) {
-        const memberListContainer = document.createElement('div');
-        memberListContainer.style.position = 'fixed';
-        memberListContainer.style.top = '50%';
-        memberListContainer.style.left = '50%';
-        memberListContainer.style.transform = 'translate(-50%, -50%)';
-        memberListContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-        memberListContainer.style.color = 'white';
-        memberListContainer.style.padding = '20px';
-        memberListContainer.style.borderRadius = '10px';
-        memberListContainer.style.zIndex = '1001';
-        memberListContainer.style.width = '300px';
-
-        // 关闭按钮
-        const closeButton = document.createElement('button');
-        closeButton.innerText = '×';
-        closeButton.style.position = 'absolute';
-        closeButton.style.top = '10px';
-        closeButton.style.right = '10px';
-        closeButton.style.backgroundColor = 'transparent';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.cursor = 'pointer';
-        closeButton.onclick = () => document.body.removeChild(memberListContainer);
-        memberListContainer.appendChild(closeButton);
-
-        // 会员列表
-        const memberList = document.createElement('div');
-        memberList.innerHTML = `<strong>会员列表：</strong><br>`;
-        members.forEach(member => {
-            memberList.innerHTML += `${member.name}<br>`;
-        });
-        memberList.innerHTML += `<small>如要加入会员请私信 zm 添加！</small>`;
-        memberListContainer.appendChild(memberList);
-
-        // 添加到页面
-        document.body.appendChild(memberListContainer);
-    }
-
-    // 显示排行榜
-    function showLeaderboard(leaderboard) {
-        const leaderboardContainer = document.createElement('div');
-        leaderboardContainer.style.position = 'fixed';
-        leaderboardContainer.style.top = '50%';
-        leaderboardContainer.style.left = '50%';
-        leaderboardContainer.style.transform = 'translate(-50%, -50%)';
-        leaderboardContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
-        leaderboardContainer.style.color = 'white';
-        leaderboardContainer.style.padding = '20px';
-        leaderboardContainer.style.borderRadius = '10px';
-        leaderboardContainer.style.zIndex = '1001';
-        leaderboardContainer.style.width = '300px';
-
-        // 关闭按钮
-        const closeButton = document.createElement('button');
-        closeButton.innerText = '×';
-        closeButton.style.position = 'absolute';
-        closeButton.style.top = '10px';
-        closeButton.style.right = '10px';
-        closeButton.style.backgroundColor = 'transparent';
-        closeButton.style.color = 'white';
-        closeButton.style.border = 'none';
-        closeButton.style.cursor = 'pointer';
-        closeButton.onclick = () => document.body.removeChild(leaderboardContainer);
-        leaderboardContainer.appendChild(closeButton);
-
-        // 排行榜内容
-        const leaderboardContent = document.createElement('div');
-        leaderboardContent.innerHTML = `<strong>排行榜：</strong><br>`;
-        leaderboard.sort((a, b) => b.score - a.score).forEach((member, index) => {
-            leaderboardContent.innerHTML += `${index + 1}. ${member.name} - ${member.score} 分<br>`;
-        });
-        leaderboardContainer.appendChild(leaderboardContent);
-
-        // 添加到页面
-        document.body.appendChild(leaderboardContainer);
-    }
-
-    // 加载 JSON 数据
-    GM_xmlhttpRequest({
-        method: 'GET',
-        url: jsonUrl,
-        onload: function (response) {
-            const data = JSON.parse(response.responseText);
-            createPluginUI(data);
-        },
-        onerror: function (error) {
-            console.error('加载 JSON 文件失败:', error);
-        }
+    // 关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.innerText = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.color = '#ffffff';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.fontSize = '20px';
+    closeButton.addEventListener('click', () => {
+      container.remove();
     });
+
+    // 更新内容
+    const updateContent = document.createElement('h2');
+    updateContent.innerText = '更新内容';
+    updateContent.style.marginTop = '0';
+
+    const updateText = document.createElement('p');
+    updateText.innerText = data.updateContent;
+
+    // 互动部分
+    const interaction = document.createElement('h2');
+    interaction.innerText = '互动';
+
+    const memberButton = document.createElement('button');
+    memberButton.innerText = '会员';
+    memberButton.style.marginRight = '10px';
+
+    const leaderboardButton = document.createElement('button');
+    leaderboardButton.innerText = '排行榜';
+
+    const eventButton = document.createElement('button');
+    eventButton.innerText = '活动';
+
+    // 新视频
+    const newVideo = document.createElement('h2');
+    newVideo.innerText = '新视频';
+
+    const videoLink = document.createElement('a');
+    videoLink.href = data.newVideo;
+    videoLink.innerText = data.newVideo;
+    videoLink.style.color = '#00a1d6';
+
+    // 将会员、排行榜、活动按钮添加到容器
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.marginBottom = '20px';
+    buttonContainer.appendChild(memberButton);
+    buttonContainer.appendChild(leaderboardButton);
+    buttonContainer.appendChild(eventButton);
+
+    // 将会员、排行榜、活动内容添加到容器
+    const contentContainer = document.createElement('div');
+
+    // 会员页面
+    const memberContent = document.createElement('div');
+    memberContent.style.display = 'none';
+    memberContent.innerHTML = `<p>会员列表：${data.members.join(', ')}</p>`;
+
+    // 排行榜页面
+    const leaderboardContent = document.createElement('div');
+    leaderboardContent.style.display = 'none';
+    const sortedLeaderboard = data.leaderboard.sort((a, b) => b.points - a.points);
+    leaderboardContent.innerHTML = sortedLeaderboard
+      .map(
+        (user) => `
+        <div style="display: flex; align-items: center; margin-bottom: 10px;">
+          <img src="${user.avatar}" alt="${user.name}" style="width: 40px; height: 40px; border-radius: 50%; margin-right: 10px;">
+          <div>
+            <p style="margin: 0;">${user.name}</p>
+            <p style="margin: 0; color: #888;">积分：${user.points}</p>
+          </div>
+        </div>
+      `
+      )
+      .join('');
+
+    // 活动页面
+    const eventContent = document.createElement('div');
+    eventContent.style.display = 'none';
+    eventContent.innerHTML = `<p>${data.event}</p>`;
+
+    // 按钮点击事件
+    memberButton.addEventListener('click', () => {
+      memberContent.style.display = 'block';
+      leaderboardContent.style.display = 'none';
+      eventContent.style.display = 'none';
+    });
+
+    leaderboardButton.addEventListener('click', () => {
+      memberContent.style.display = 'none';
+      leaderboardContent.style.display = 'block';
+      eventContent.style.display = 'none';
+    });
+
+    eventButton.addEventListener('click', () => {
+      memberContent.style.display = 'none';
+      leaderboardContent.style.display = 'none';
+      eventContent.style.display = 'block';
+    });
+
+    // 将内容添加到容器
+    container.appendChild(closeButton);
+    container.appendChild(updateContent);
+    container.appendChild(updateText);
+    container.appendChild(interaction);
+    container.appendChild(buttonContainer);
+    container.appendChild(memberContent);
+    container.appendChild(leaderboardContent);
+    container.appendChild(eventContent);
+    container.appendChild(newVideo);
+    container.appendChild(videoLink);
+
+    document.body.appendChild(container);
+  }
+
+  // 初始化插件
+  async function initPlugin() {
+    const data = await loadJSON();
+    createPluginUI(data);
+  }
+
+  // 监听按键 K 打开插件
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'k' || event.key === 'K') {
+      initPlugin();
+    }
+  });
 })();
