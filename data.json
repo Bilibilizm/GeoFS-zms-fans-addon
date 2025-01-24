@@ -1,5 +1,5 @@
 {
-  "updateContent": "What Can I say",
+  "updateContent": "暂无",
   "members": ["zm", "Geo-VE", "一架刚出生的C919", "星皓航空", "屑B-2445"],
   "leaderboard": [
     {
@@ -19,11 +19,16 @@
     },
     {
       "name": "星皓航空",
-      "avatar": "https://i.ibb.co/3yRJhM3/1737708654699.jpg",
+      "avatar": "https://i.ibb.co/THNw5ZD/image.png",
+      "points": 1000
+    },
+    {
+      "name": "屑B-2445",
+      "avatar": "https://i.ibb.co/TKGdNHW/image.png",
       "points": 1000
     }
   ],
-  "event": "肘击",
+  "event": "暂无",
   "newVideo": "https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click",
   "plugins": []
 }
