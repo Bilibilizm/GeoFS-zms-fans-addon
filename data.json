@@ -11,7 +11,7 @@
       "name": "Geo-VE",
       "avatar": "https://i.ibb.co/SJXWw7g/1-Y5-T08-A6-ZYBS91-PD-K-8-P50.jpg",
       "points": 100
-    }
+    },
     {
       "name": "一架刚出生的C919",
       "avatar": "https://i.ibb.co/x7PbZX4/BE-2-V-GNQ3-LWZBBDH0-V9-O5.jpg",
@@ -20,5 +20,5 @@
   ],
   "event": "肘击",
   "newVideo": "https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click",
-  "plugins": [
+  "plugins": []
 }
