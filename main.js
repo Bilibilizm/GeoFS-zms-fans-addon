@@ -1,8 +1,8 @@
 (function () {
   'use strict';
 
-  let pluginContainer = null; // 用于存储插件界面
-  let isPluginOpen = false; // 标记插件界面是否已打开
+  let pluginContainer = null;
+  let isPluginOpen = false; 
 
   // 动态加载 JSON 数据
   async function loadJSON() {
