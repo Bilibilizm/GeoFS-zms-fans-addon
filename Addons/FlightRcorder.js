@@ -234,7 +234,7 @@
 
     // 监听键盘事件
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'O' || e.key === 'o') {
+        if (e.key === 'U' || e.key === 'o') {
             menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
             menuOpen = !menuOpen;
         }
