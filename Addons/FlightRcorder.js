@@ -1,46 +1,14 @@
-
 (function () {
     'use strict';
 
     // 初始化变量
     let menuOpen = false;
-    let language = 'English'; 
     let flights = JSON.parse(localStorage.getItem('flights')) || [];
 
     // 语言文本
     const texts = {
-        'English': {
-            'menuTitle': 'GeoFS Flight Recorder',
-            'language': 'Language',
-            'previousFlights': 'Previous Flights',
-            'import': 'Import',
-            'view': 'View',
-            'edit': 'Edit',
-            'delete': 'Delete',
-            'confirmDelete': 'Are you sure you want to delete this flight?',
-            'flightNumber': 'Flight Number',
-            'aircraftReg': 'Aircraft Registration',
-            'departureICAO': 'Departure ICAO',
-            'arrivalICAO': 'Arrival ICAO',
-            'route': 'Route',
-            'actualDeparture': 'Actual Departure Time',
-            'actualArrival': 'Actual Arrival Time',
-            'cruiseAltitude': 'Cruise Altitude',
-            'importImage': 'Import Image (Optional)',
-            'importJson': 'Import JSON Flight Plan (Optional)',
-            'save': 'Save',
-            'close': 'Close',
-            'invalidICAO': 'ICAO code must be 4 uppercase letters!',
-            'invalidTime': 'Time format must be HH:MM!',
-            'requiredField': 'All fields are required!',
-            'noFlights': 'No flights recorded yet.',
-            'joinQQGroup': 'Join our QQ group: 797834076',
-            'joinDiscordGroup': 'Join our Discord Group',
-            'author': 'Author',
-            'maxImages': 'You can upload up to 6 images!',
-        },
         '简体中文': {
-            'menuTitle': 'GeoFS 飞行记录器',
+            'menuTitle': 'GeoFS 飞行记录器（zm粉丝专属豪华至尊超级牛逼puls pro版）',
             'language': '语言',
             'previousFlights': '历史飞行',
             'import': '导入',
@@ -69,36 +37,6 @@
             'author': '作者',
             'maxImages': '最多只能上传6张图片！',
         },
-        '繁體中文': {
-            'menuTitle': 'GeoFS 飛行記錄器',
-            'language': '語言',
-            'previousFlights': '歷史飛行',
-            'import': '導入',
-            'view': '查看',
-            'edit': '編輯',
-            'delete': '刪除',
-            'confirmDelete': '確定要刪除此飛行記錄嗎？',
-            'flightNumber': '航班號',
-            'aircraftReg': '飛機註冊號',
-            'departureICAO': '起飛機場ICAO',
-            'arrivalICAO': '降落機場ICAO',
-            'route': '航路',
-            'actualDeparture': '實際起飛時間',
-            'actualArrival': '實際到達時間',
-            'cruiseAltitude': '巡航高度',
-            'importImage': '導入圖片（選填）',
-            'importJson': '導入JSON飛行計劃（選填）',
-            'save': '保存',
-            'close': '關閉',
-            'invalidICAO': 'ICAO代碼必須為4個大寫字母！',
-            'invalidTime': '時間格式必須為HH:MM！',
-            'requiredField': '所有欄位必須填寫！',
-            'noFlights': '暫無飛行記錄。',
-            'joinQQGroup': '加入我们QQ交流群: 797834076',
-            'joinDiscordGroup': '加入我們的Discord群組',
-            'author': '作者',
-            'maxImages': '最多只能上傳6張圖片！',
-        },
     };
 
     // 创建菜单
@@ -121,7 +59,7 @@
 
     // 菜单标题（可拖动）
     const menuTitle = document.createElement('div');
-    menuTitle.innerText = texts[language].menuTitle;
+    menuTitle.innerText = texts['简体中文'].menuTitle;
     menuTitle.style.fontSize = '18px';
     menuTitle.style.fontWeight = 'bold';
     menuTitle.style.marginBottom = '10px';
@@ -130,27 +68,11 @@
 
     // 作者信息
     const authorInfo = document.createElement('div');
-    authorInfo.innerText = `${texts[language].author}：開飛機のzm`;
+    authorInfo.innerText = `${texts['简体中文'].author}：開飛機のzm`;
     authorInfo.style.fontSize = '12px';
     authorInfo.style.color = '#666';
     authorInfo.style.marginBottom = '10px';
     menu.appendChild(authorInfo);
-
-    // 语言切换
-    const languageSelect = document.createElement('select');
-    languageSelect.innerHTML = `
-        <option value="English">English</option>
-        <option value="简体中文">简体中文</option>
-        <option value="繁體中文">繁體中文</option>
-    `;
-    languageSelect.style.marginBottom = '10px';
-    languageSelect.style.width = '100%';
-    languageSelect.style.padding = '5px';
-    languageSelect.addEventListener('change', () => {
-        language = languageSelect.value;
-        updateUI();
-    });
-    menu.appendChild(languageSelect);
 
     // 历史飞行记录
     const flightsList = document.createElement('div');
@@ -159,7 +81,7 @@
 
     // 导入按钮
     const importButton = document.createElement('button');
-    importButton.innerText = texts[language].import;
+    importButton.innerText = texts['简体中文'].import;
     importButton.style.width = '100%';
     importButton.style.padding = '8px';
     importButton.style.backgroundColor = '#007BFF';
@@ -177,14 +99,14 @@
     groupInfo.style.color = '#666';
     groupInfo.innerHTML = `
         <p>${texts['简体中文'].joinQQGroup}</p>
-        <p><a href="https://discord.gg/4dGHsNqgCH" target="_blank" style="color: #007BFF; text-decoration: none;">${texts[language].joinDiscordGroup}</a></p>
+        <p><a href="https://discord.gg/4dGHsNqgCH" target="_blank" style="color: #007BFF; text-decoration: none;">${texts['简体中文'].joinDiscordGroup}</a></p>
     `;
     menu.appendChild(groupInfo);
 
     // 删除飞行记录
     window.deleteFlight = function (index) {
         console.log(`Attempting to delete flight at index ${index}`);
-        if (confirm(texts[language].confirmDelete)) {
+        if (confirm(texts['简体中文'].confirmDelete)) {
             console.log('User confirmed deletion'); 
             flights.splice(index, 1); 
             console.log('Updated flights array:', flights); 
@@ -199,12 +121,12 @@
     // 更新界面语言
     function updateUI() {
         console.log('Updating UI...'); 
-        menuTitle.innerText = texts[language].menuTitle;
-        authorInfo.innerText = `${texts[language].author}：開飛機のzm`;
-        importButton.innerText = texts[language].import;
-        flightsList.innerHTML = `<h3>${texts[language].previousFlights}</h3>`;
+        menuTitle.innerText = texts['简体中文'].menuTitle;
+        authorInfo.innerText = `${texts['简体中文'].author}：開飛機のzm`;
+        importButton.innerText = texts['简体中文'].import;
+        flightsList.innerHTML = `<h3>${texts['简体中文'].previousFlights}</h3>`;
         if (flights.length === 0) {
-            flightsList.innerHTML += `<p>${texts[language].noFlights}</p>`;
+            flightsList.innerHTML += `<p>${texts['简体中文'].noFlights}</p>`;
         } else {
             flights.forEach((flight, index) => {
                 const flightItem = document.createElement('div');
@@ -221,8 +143,8 @@
                         <p><strong>${index + 1}. ${flight.flightNumber}</strong> - ${flight.departureICAO} → ${flight.arrivalICAO}</p>
                     </div>
                     <div>
-                        <button onclick="viewFlightDetails(${index})" style="margin-right: 5px;">${texts[language].view}</button>
-                        <button onclick="editFlight(${index})" style="margin-right: 5px;">${texts[language].edit}</button>
+                        <button onclick="viewFlightDetails(${index})" style="margin-right: 5px;">${texts['简体中文'].view}</button>
+                        <button onclick="editFlight(${index})" style="margin-right: 5px;">${texts['简体中文'].edit}</button>
                         <button onclick="deleteFlight(${index})" style="background-color: #dc3545; color: white; border: none; border-radius: 5px; padding: 5px 10px; cursor: pointer;">❌</button>
                     </div>
                 `;
@@ -259,19 +181,19 @@
 
         const form = document.createElement('div');
         form.innerHTML = `
-            <h3>${texts[language].import}</h3>
-            <label>${texts[language].flightNumber}: <input type="text" id="flightNumber"></label><br>
-            <label>${texts[language].aircraftReg}: <input type="text" id="aircraftReg"></label><br>
-            <label>${texts[language].departureICAO}: <input type="text" id="departureICAO"></label><br>
-            <label>${texts[language].arrivalICAO}: <input type="text" id="arrivalICAO"></label><br>
-            <label>${texts[language].route}: <textarea id="route"></textarea></label><br>
-            <label>${texts[language].actualDeparture}: <input type="text" id="actualDeparture"></label><br>
-            <label>${texts[language].actualArrival}: <input type="text" id="actualArrival"></label><br>
-            <label>${texts[language].cruiseAltitude}: <input type="text" id="cruiseAltitude"></label><br>
-            <label>${texts[language].importImage}: <input type="file" id="importImage" multiple></label><br>
-            <label>${texts[language].importJson}: <input type="file" id="importJson"></label><br>
-            <button onclick="saveFlight()" style="margin-right: 5px;">${texts[language].save}</button>
-            <button onclick="closeForm()">${texts[language].close}</button>
+            <h3>${texts['简体中文'].import}</h3>
+            <label>${texts['简体中文'].flightNumber}: <input type="text" id="flightNumber"></label><br>
+            <label>${texts['简体中文'].aircraftReg}: <input type="text" id="aircraftReg"></label><br>
+            <label>${texts['简体中文'].departureICAO}: <input type="text" id="departureICAO"></label><br>
+            <label>${texts['简体中文'].arrivalICAO}: <input type="text" id="arrivalICAO"></label><br>
+            <label>${texts['简体中文'].route}: <textarea id="route"></textarea></label><br>
+            <label>${texts['简体中文'].actualDeparture}: <input type="text" id="actualDeparture"></label><br>
+            <label>${texts['简体中文'].actualArrival}: <input type="text" id="actualArrival"></label><br>
+            <label>${texts['简体中文'].cruiseAltitude}: <input type="text" id="cruiseAltitude"></label><br>
+            <label>${texts['简体中文'].importImage}: <input type="file" id="importImage" multiple></label><br>
+            <label>${texts['简体中文'].importJson}: <input type="file" id="importJson"></label><br>
+            <button onclick="saveFlight()" style="margin-right: 5px;">${texts['简体中文'].save}</button>
+            <button onclick="closeForm()">${texts['简体中文'].close}</button>
         `;
         formContainer.appendChild(form);
         document.body.appendChild(formContainer);
@@ -314,15 +236,15 @@
 
             // 校验输入
             if (!flightNumber || !aircraftReg || !departureICAO || !arrivalICAO || !route || !actualDeparture || !actualArrival || !cruiseAltitude) {
-                alert(texts[language].requiredField);
+                alert(texts['简体中文'].requiredField);
                 return;
             }
             if (!/^[A-Z]{4}$/.test(departureICAO) || !/^[A-Z]{4}$/.test(arrivalICAO)) {
-                alert(texts[language].invalidICAO);
+                alert(texts['简体中文'].invalidICAO);
                 return;
             }
             if (!/^\d{2}:\d{2}$/.test(actualDeparture) || !/^\d{2}:\d{2}$/.test(actualArrival)) {
-                alert(texts[language].invalidTime);
+                alert(texts['简体中文'].invalidTime);
                 return;
             }
 
@@ -330,7 +252,7 @@
             const images = [];
             if (imageFiles.length > 0) {
                 if (imageFiles.length > 6) {
-                    alert(texts[language].maxImages);
+                    alert(texts['简体中文'].maxImages);
                     return;
                 }
                 for (let i = 0; i < imageFiles.length; i++) {
@@ -384,21 +306,21 @@
         };
     }
 
-// 查看飞行记录详情
+    // 查看飞行记录详情
     window.viewFlightDetails = function (index) {
         const flight = flights[index];
         const details = `
             <h3>${flight.flightNumber}</h3>
-            <p><strong>${texts[language].aircraftReg}:</strong> ${flight.aircraftReg}</p>
-            <p><strong>${texts[language].departureICAO}:</strong> ${flight.departureICAO}</p>
-            <p><strong>${texts[language].arrivalICAO}:</strong> ${flight.arrivalICAO}</p>
-            <p><strong>${texts[language].route}:</strong> ${flight.route}</p>
-            <p><strong>${texts[language].actualDeparture}:</strong> ${flight.actualDeparture}</p>
-            <p><strong>${texts[language].actualArrival}:</strong> ${flight.actualArrival}</p>
-            <p><strong>${texts[language].cruiseAltitude}:</strong> ${flight.cruiseAltitude}</p>
-            ${flight.images.length > 0 ? `<p><strong>${texts[language].importImage}:</strong></p>` : ''}
+            <p><strong>${texts['简体中文'].aircraftReg}:</strong> ${flight.aircraftReg}</p>
+            <p><strong>${texts['简体中文'].departureICAO}:</strong> ${flight.departureICAO}</p>
+            <p><strong>${texts['简体中文'].arrivalICAO}:</strong> ${flight.arrivalICAO}</p>
+            <p><strong>${texts['简体中文'].route}:</strong> ${flight.route}</p>
+            <p><strong>${texts['简体中文'].actualDeparture}:</strong> ${flight.actualDeparture}</p>
+            <p><strong>${texts['简体中文'].actualArrival}:</strong> ${flight.actualArrival}</p>
+            <p><strong>${texts['简体中文'].cruiseAltitude}:</strong> ${flight.cruiseAltitude}</p>
+            ${flight.images.length > 0 ? `<p><strong>${texts['简体中文'].importImage}:</strong></p>` : ''}
             ${flight.images.map((img, i) => `<img src="${img}" style="max-width: 100%; margin-bottom: 10px;">`).join('')}
-            ${flight.jsonData ? `<p><strong>${texts[language].importJson}:</strong></p><pre>${JSON.stringify(flight.jsonData, null, 2)}</pre>` : ''}
+            ${flight.jsonData ? `<p><strong>${texts['简体中文'].importJson}:</strong></p><pre>${JSON.stringify(flight.jsonData, null, 2)}</pre>` : ''}
         `;
 
         const detailsContainer = document.createElement('div');
@@ -418,7 +340,7 @@
         detailsContainer.innerHTML = details;
 
         const closeButton = document.createElement('button');
-        closeButton.innerText = texts[language].close;
+        closeButton.innerText = texts['简体中文'].close;
         closeButton.style.marginTop = '10px';
         closeButton.style.padding = '8px';
         closeButton.style.backgroundColor = '#007BFF';
@@ -454,17 +376,17 @@
 
         const form = document.createElement('div');
         form.innerHTML = `
-            <h3>${texts[language].edit}</h3>
-            <label>${texts[language].flightNumber}: <input type="text" id="editFlightNumber" value="${flight.flightNumber}"></label><br>
-            <label>${texts[language].aircraftReg}: <input type="text" id="editAircraftReg" value="${flight.aircraftReg}"></label><br>
-            <label>${texts[language].departureICAO}: <input type="text" id="editDepartureICAO" value="${flight.departureICAO}"></label><br>
-            <label>${texts[language].arrivalICAO}: <input type="text" id="editArrivalICAO" value="${flight.arrivalICAO}"></label><br>
-            <label>${texts[language].route}: <textarea id="editRoute">${flight.route}</textarea></label><br>
-            <label>${texts[language].actualDeparture}: <input type="text" id="editActualDeparture" value="${flight.actualDeparture}"></label><br>
-            <label>${texts[language].actualArrival}: <input type="text" id="editActualArrival" value="${flight.actualArrival}"></label><br>
-            <label>${texts[language].cruiseAltitude}: <input type="text" id="editCruiseAltitude" value="${flight.cruiseAltitude}"></label><br>
-            <button onclick="saveEditedFlight(${index})" style="margin-right: 5px;">${texts[language].save}</button>
-            <button onclick="closeForm()">${texts[language].close}</button>
+            <h3>${texts['简体中文'].edit}</h3>
+            <label>${texts['简体中文'].flightNumber}: <input type="text" id="editFlightNumber" value="${flight.flightNumber}"></label><br>
+            <label>${texts['简体中文'].aircraftReg}: <input type="text" id="editAircraftReg" value="${flight.aircraftReg}"></label><br>
+            <label>${texts['简体中文'].departureICAO}: <input type="text" id="editDepartureICAO" value="${flight.departureICAO}"></label><br>
+            <label>${texts['简体中文'].arrivalICAO}: <input type="text" id="editArrivalICAO" value="${flight.arrivalICAO}"></label><br>
+            <label>${texts['简体中文'].route}: <textarea id="editRoute">${flight.route}</textarea></label><br>
+            <label>${texts['简体中文'].actualDeparture}: <input type="text" id="editActualDeparture" value="${flight.actualDeparture}"></label><br>
+            <label>${texts['简体中文'].actualArrival}: <input type="text" id="editActualArrival" value="${flight.actualArrival}"></label><br>
+            <label>${texts['简体中文'].cruiseAltitude}: <input type="text" id="editCruiseAltitude" value="${flight.cruiseAltitude}"></label><br>
+            <button onclick="saveEditedFlight(${index})" style="margin-right: 5px;">${texts['简体中文'].save}</button>
+            <button onclick="closeForm()">${texts['简体中文'].close}</button>
         `;
         formContainer.appendChild(form);
         document.body.appendChild(formContainer);
@@ -482,15 +404,15 @@
 
             // 校验输入
             if (!flightNumber || !aircraftReg || !departureICAO || !arrivalICAO || !route || !actualDeparture || !actualArrival || !cruiseAltitude) {
-                alert(texts[language].requiredField);
+                alert(texts['简体中文'].requiredField);
                 return;
             }
             if (!/^[A-Z]{4}$/.test(departureICAO) || !/^[A-Z]{4}$/.test(arrivalICAO)) {
-                alert(texts[language].invalidICAO);
+                alert(texts['简体中文'].invalidICAO);
                 return;
             }
             if (!/^\d{2}:\d{2}$/.test(actualDeparture) || !/^\d{2}:\d{2}$/.test(actualArrival)) {
-                alert(texts[language].invalidTime);
+                alert(texts['简体中文'].invalidTime);
                 return;
             }
 
@@ -519,7 +441,7 @@
 
     // 删除飞行记录
     window.deleteFlight = function (index) {
-        if (confirm(texts[language].confirmDelete)) {
+        if (confirm(texts['简体中文'].confirmDelete)) {
             flights.splice(index, 1);
             localStorage.setItem('flights', JSON.stringify(flights)); 
             updateUI();
