@@ -1,5 +1,5 @@
 {
-  "updateContent": "其他插件集合和其他功能正在制作！",
+  "updateContent": "音乐播放器正在修复bug！很快将会加在这里",
   "members": ["zm", "Geo-VE", "一架刚出生的C919", "星皓航空", "屑B-2445", "燮Yeff"],
   "leaderboard": [
     {
@@ -35,7 +35,6 @@
   ],
   "event": "暂无",
   "newVideo": "https://www.bilibili.com/video/BV1GJ411x7h7/?spm_id_from=333.337.search-card.all.click",
-  "plugins": [],
-  "pluginMessage": "没有内容",
+  "pluginMessage": "快捷键：客舱广播：Alt+Y；安全须知播放器：J；检查单L；飞行记录器：I",
   "adContent": "欢迎使用zm粉丝专属插件！" 
 }
