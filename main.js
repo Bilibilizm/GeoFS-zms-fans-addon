@@ -196,6 +196,15 @@
     const updateText = document.createElement('p');
     updateText.innerText = data.updateContent;
 
+    // 插件留言
+    const pluginMessageTitle = document.createElement('h3');
+    pluginMessageTitle.innerText = '插件';
+    pluginMessageTitle.style.marginTop = '20px';
+    pluginMessageTitle.style.fontSize = '16px';
+
+    const pluginMessageText = document.createElement('p');
+    pluginMessageText.innerText = data.pluginMessage;  // 动态加载留言内容
+
     // 互动部分
     const interaction = document.createElement('h3');
     interaction.innerText = '互动';
@@ -331,6 +340,8 @@
     pluginContainer.appendChild(mainTitle);
     pluginContainer.appendChild(updateContent);
     pluginContainer.appendChild(updateText);
+    pluginContainer.appendChild(pluginMessageTitle);
+    pluginContainer.appendChild(pluginMessageText);  // 添加插件留言
     pluginContainer.appendChild(interaction);
     pluginContainer.appendChild(memberButton);
     pluginContainer.appendChild(leaderboardButton);
@@ -357,7 +368,7 @@
     }
   }
 
-  // 快捷键
+  // 监听按键 K 打开插件
   document.addEventListener('keydown', (event) => {
     if (event.key === 'k' || event.key === 'K') {
       console.log('K key pressed');
@@ -367,50 +378,4 @@
 
   // 调试信息
   console.log('GeoFS 粉丝专属插件已加载！');
-})();
-
-
-    // Addons
-
-(function() {
-    'use strict';
-
-    // 插件URL
-    const cabinSoundsUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/Addons/CabinSounds.js';
-    const checklistUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/Addons/Checklist.js';
-    const FlightRcorderUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/FlightRcorder.js';
-    const VideoUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/Video.js';
-
-    // 动态加载并运行JS代码
-    function loadAndRunScript(url) {
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`网络响应不正常: ${response.statusText}`);
-                }
-                return response.text();
-            })
-            .then(code => {
-                const script = document.createElement('script');
-                script.textContent = code;
-                document.head.appendChild(script);
-                console.log(`插件加载成功: ${url}`);
-            })
-            .catch(error => {
-                console.error(`插件加载失败: ${url}`, error);
-            });
-    }
-
-    // 客舱广播
-    loadAndRunScript(cabinSoundsUrl);
-
-    // 检查单
-    loadAndRunScript(checklistUrl);
-
-    //飞行记录器
-    loadAndRunScript(FlightRcorderUrl);
-
-    //安全须知
-    loadAndRunScript(VideoUrl);
-    console.log('GeoFS 插件加载器已启动');
 })();
