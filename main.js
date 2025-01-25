@@ -359,7 +359,7 @@
 
   // 快捷键
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'l' || event.key === 'L') {
+    if (event.key === 'k' || event.key === 'K') {
       console.log('K key pressed');
       initPlugin();
     }
