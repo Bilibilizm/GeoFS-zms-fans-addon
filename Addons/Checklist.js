@@ -1,15 +1,4 @@
 
-// ==UserScript==
-// @name         GeoFS Flight Inspection Checklist
-// @namespace    http://tampermonkey.net/
-// @version      1.3
-// @description  Thanks for useing.Good Flight!
-// @author       zm
-// @match        https://www.geo-fs.com/geofs.php?v=3.9
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=geo-fs.com
-// @grant        none
-// ==/UserScript==
-
 (function () {
     'use strict';
 
@@ -66,8 +55,8 @@
             discordLink: '加入我们 Discord 群组',
             lockLabel: '锁定菜单',
             unlockLabel: '菜单已解锁',
-            versionLabel: '1.3 版本更新内容',
-            versionContent: '1. 按钮改为 K 来打开关闭菜单\n2. 修复了已知 bug\n3. 新增锁定功能，按 Shift + K 解锁菜单'
+            versionLabel: '1.2 版本更新内容',
+            versionContent: '1. 按钮改为 L 来打开关闭菜单\n2. 修复了已知 bug\n3. 新增锁定功能，按 Shift + L 解锁菜单'
         },
         'zh-TW': {
             title: 'GeoFS 飛行檢查單',
@@ -80,8 +69,8 @@
             discordLink: '加入我們 Discord 群組',
             lockLabel: '鎖定菜單',
             unlockLabel: '菜單已解鎖',
-            versionLabel: '1.3 版本更新內容',
-            versionContent: '1. 按鈕改為 K 來打開關閉菜單\n2. 修復了已知 bug\n3. 新增鎖定功能，按 Shift + K 解鎖菜單'
+            versionLabel: '1.2 版本更新內容',
+            versionContent: '1. 按鈕改為 L 來打開關閉菜單\n2. 修復了已知 bug\n3. 新增鎖定功能，按 Shift + L 解鎖菜單'
         },
         'en': {
             title: 'GeoFS Flight Checklist',
@@ -94,8 +83,8 @@
             discordLink: 'Join our Discord group',
             lockLabel: 'Lock Menu',
             unlockLabel: 'Menu Unlocked',
-            versionLabel: '1.3 Version Update',
-            versionContent: '1. Changed button to K for opening/closing menu\n2. Fixed known bugs\n3. Added lock feature, press Shift + K to unlock menu'
+            versionLabel: '1.2 Version Update',
+            versionContent: '1. Changed button to L for opening/closing menu\n2. Fixed known bugs\n3. Added lock feature, press Shift + L to unlock menu'
         }
     };
 
@@ -467,7 +456,7 @@ function showVersionPopup(lang) {
     // 通过 L 键打开/关闭菜单
     let menu = null;
     document.addEventListener('keydown', (e) => {
-        if ((e.key === 'K' || e.key === 'k') && !isLocked) {
+        if ((e.key === 'L' || e.key === 'l') && !isLocked) {
             if (menu) {
                 menu.remove();
                 menu = null;
@@ -477,7 +466,7 @@ function showVersionPopup(lang) {
         }
 
         // 通过 Shift + L 解锁菜单
-        if ((e.key === 'K' || e.key === 'k') && e.shiftKey) {
+        if ((e.key === 'L' || e.key === 'l') && e.shiftKey) {
             isLocked = false;
             alert(titles[currentLang].unlockLabel);
         }
