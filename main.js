@@ -359,7 +359,7 @@
 
   // 监听按键 K 打开插件
   document.addEventListener('keydown', (event) => {
-    if (event.key === 'k' || event.key === 'K') {
+    if (event.key === 'l' || event.key === 'L') {
       console.log('K key pressed');
       initPlugin();
     }
@@ -367,4 +367,50 @@
 
   // 调试信息
   console.log('GeoFS 粉丝专属插件已加载！');
+})();
+
+
+    // Addons
+
+(function() {
+    'use strict';
+
+    // 插件URL
+    const cabinSoundsUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/Addons/CabinSounds.js';
+    const checklistUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/Addons/Checklist.js';
+    const FlightRcorderUrl = 'https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/FlightRcorder.js';
+    const VideoUrl = 'https://github.com/Bilibilizm/GeoFS-zms-fans-addon/blob/main/Addons/Video.js';
+
+    // 动态加载并运行JS代码
+    function loadAndRunScript(url) {
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`网络响应不正常: ${response.statusText}`);
+                }
+                return response.text();
+            })
+            .then(code => {
+                const script = document.createElement('script');
+                script.textContent = code;
+                document.head.appendChild(script);
+                console.log(`插件加载成功: ${url}`);
+            })
+            .catch(error => {
+                console.error(`插件加载失败: ${url}`, error);
+            });
+    }
+
+    // 客舱广播
+    loadAndRunScript(cabinSoundsUrl);
+
+    // 检查单
+    loadAndRunScript(checklistUrl);
+
+    //飞行记录器
+    loadAndRunScript(FlightRcorderUrl);
+
+    //安全须知
+    loadAndRunScript(VideoUrl);
+    console.log('GeoFS 插件加载器已启动');
 })();
