@@ -2,7 +2,7 @@
   'use strict';
 
   let pluginContainer = null;
-  let isPluginOpen = false; 
+  let isPluginOpen = false;
 
   // 动态加载 JSON 数据
   async function loadJSON() {
@@ -22,18 +22,14 @@
 
   // 处理排行榜数据：排序并处理相同积分的名次
   function processLeaderboard(leaderboard) {
-    // 按积分从高到低排序
     leaderboard.sort((a, b) => b.points - a.points);
-
-    // 处理相同积分的名次
     let rank = 1;
     for (let i = 0; i < leaderboard.length; i++) {
       if (i > 0 && leaderboard[i].points < leaderboard[i - 1].points) {
-        rank = i + 1; // 更新名次
+        rank = i + 1;
       }
-      leaderboard[i].rank = rank; // 添加名次字段
+      leaderboard[i].rank = rank;
     }
-
     return leaderboard;
   }
 
@@ -47,13 +43,13 @@
     modal.style.backgroundColor = '#ffffff';
     modal.style.color = '#333333';
     modal.style.padding = '20px';
-    modal.style.borderRadius = '10px';
+    modal.style.borderRadius = '15px';
     modal.style.zIndex = '10000';
     modal.style.fontFamily = 'Arial, sans-serif';
     modal.style.width = '400px';
-    modal.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-    modal.style.display = 'none'; // 初始隐藏
-    modal.style.opacity = '0'; // 初始透明
+    modal.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+    modal.style.display = 'none';
+    modal.style.opacity = '0';
     modal.style.transition = 'opacity 0.3s ease';
 
     // 标题
@@ -61,7 +57,7 @@
     modalTitle.innerText = title;
     modalTitle.style.marginTop = '0';
     modalTitle.style.color = '#00a1d6';
-    modalTitle.style.fontSize = '18px';
+    modalTitle.style.fontSize = '20px';
 
     // 关闭按钮
     const closeButton = document.createElement('button');
@@ -73,7 +69,7 @@
     closeButton.style.border = 'none';
     closeButton.style.color = '#333333';
     closeButton.style.cursor = 'pointer';
-    closeButton.style.fontSize = '20px';
+    closeButton.style.fontSize = '24px';
     closeButton.addEventListener('click', () => {
       modal.style.opacity = '0';
       setTimeout(() => {
@@ -84,6 +80,8 @@
     // 内容
     const modalContent = document.createElement('div');
     modalContent.innerHTML = content;
+    modalContent.style.maxHeight = '400px'; // 设置最大高度
+    modalContent.style.overflowY = 'auto'; // 添加滚动条
 
     // 将标题、关闭按钮和内容添加到模态框
     modal.appendChild(modalTitle);
@@ -116,6 +114,56 @@
     return modal;
   }
 
+  // 创建广告模态框
+  function createAdModal(content) {
+    const adModal = document.createElement('div');
+    adModal.style.position = 'fixed';
+    adModal.style.top = '50%';
+    adModal.style.left = '50%';
+    adModal.style.transform = 'translate(-50%, -50%)';
+    adModal.style.backgroundColor = '#ffffff';
+    adModal.style.color = '#333333';
+    adModal.style.padding = '20px';
+    adModal.style.borderRadius = '15px';
+    adModal.style.zIndex = '10001'; // 确保广告在最上层
+    adModal.style.fontFamily = 'Arial, sans-serif';
+    adModal.style.width = '400px';
+    adModal.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+    adModal.style.display = 'none';
+    adModal.style.opacity = '0';
+    adModal.style.transition = 'opacity 0.3s ease';
+
+    // 广告内容
+    const adContent = document.createElement('p');
+    adContent.innerText = content;
+    adContent.style.textAlign = 'center';
+    adContent.style.fontSize = '16px';
+
+    // 关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.innerText = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.color = '#333333';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.fontSize = '24px';
+    closeButton.addEventListener('click', () => {
+      adModal.style.opacity = '0';
+      setTimeout(() => {
+        adModal.style.display = 'none';
+      }, 300);
+    });
+
+    adModal.appendChild(adContent);
+    adModal.appendChild(closeButton);
+    document.body.appendChild(adModal);
+
+    return adModal;
+  }
+
   // 创建主插件界面
   async function createPluginUI(data) {
     if (!data) {
@@ -136,11 +184,13 @@
     pluginContainer.style.backgroundColor = '#ffffff';
     pluginContainer.style.color = '#333333';
     pluginContainer.style.padding = '20px';
-    pluginContainer.style.borderRadius = '10px';
+    pluginContainer.style.borderRadius = '15px';
     pluginContainer.style.zIndex = '10000';
     pluginContainer.style.fontFamily = 'Arial, sans-serif';
     pluginContainer.style.width = '300px';
-    pluginContainer.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+    pluginContainer.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+    pluginContainer.style.maxHeight = '80vh'; // 设置最大高度
+    pluginContainer.style.overflowY = 'auto'; // 添加滚动条
 
     // 实现主界面拖动
     let isDragging = false;
@@ -174,7 +224,7 @@
     closeButton.style.border = 'none';
     closeButton.style.color = '#333333';
     closeButton.style.cursor = 'pointer';
-    closeButton.style.fontSize = '20px';
+    closeButton.style.fontSize = '24px';
     closeButton.addEventListener('click', () => {
       pluginContainer.style.display = 'none';
       isPluginOpen = false;
@@ -185,7 +235,7 @@
     mainTitle.innerText = 'zm 粉丝专属插件';
     mainTitle.style.marginTop = '0';
     mainTitle.style.color = '#00a1d6';
-    mainTitle.style.fontSize = '18px';
+    mainTitle.style.fontSize = '20px';
 
     // 更新内容
     const updateContent = document.createElement('h3');
@@ -203,7 +253,7 @@
     pluginMessageTitle.style.fontSize = '16px';
 
     const pluginMessageText = document.createElement('p');
-    pluginMessageText.innerText = data.pluginMessage;  // 动态加载留言内容
+    pluginMessageText.innerText = data.pluginMessage;
 
     // 互动部分
     const interaction = document.createElement('h3');
@@ -341,7 +391,7 @@
     pluginContainer.appendChild(updateContent);
     pluginContainer.appendChild(updateText);
     pluginContainer.appendChild(pluginMessageTitle);
-    pluginContainer.appendChild(pluginMessageText);  // 添加插件留言
+    pluginContainer.appendChild(pluginMessageText);
     pluginContainer.appendChild(interaction);
     pluginContainer.appendChild(memberButton);
     pluginContainer.appendChild(leaderboardButton);
@@ -350,6 +400,13 @@
     pluginContainer.appendChild(videoLink);
 
     document.body.appendChild(pluginContainer);
+
+    // 显示广告模态框
+    const adModal = createAdModal(data.adContent);
+    adModal.style.display = 'block';
+    setTimeout(() => {
+      adModal.style.opacity = '1';
+    }, 10);
   }
 
   // 初始化插件
@@ -380,9 +437,6 @@
   console.log('GeoFS 粉丝专属插件已加载！');
 })();
 
-
-
-
     // Addons
 
 (function() {
@@ -393,6 +447,7 @@
     const checklistUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/Addons/Checklist.js';
     const FlightRcorderUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/FlightRcorder.js';
     const VideoUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/Video.js';
+    const LiverySelectorUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/LiverySelector.js';
 
     // 动态加载并运行JS代码
     function loadAndRunScript(url) {
@@ -414,16 +469,11 @@
             });
     }
 
-    // 客舱广播
+
     loadAndRunScript(cabinSoundsUrl);
-
-    // 检查单
     loadAndRunScript(checklistUrl);
-
-    //飞行记录器
     loadAndRunScript(FlightRcorderUrl);
-
-    //安全须知
     loadAndRunScript(VideoUrl);
+    loadAndRunScript(LiverySelectorUrl);
     console.log('GeoFS 插件加载器已启动');
 })();
