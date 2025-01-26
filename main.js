@@ -248,7 +248,7 @@
 
     // 插件留言
     const pluginMessageTitle = document.createElement('h3');
-    pluginMessageTitle.innerText = '插件';
+    pluginMessageTitle.innerText = '插件使用须知';
     pluginMessageTitle.style.marginTop = '20px';
     pluginMessageTitle.style.fontSize = '16px';
 
