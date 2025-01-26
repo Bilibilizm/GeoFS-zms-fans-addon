@@ -448,6 +448,7 @@
     const FlightRcorderUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/FlightRcorder.js';
     const VideoUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/Video.js';
     const LiverySelectorUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/LiverySelector.js';
+    const LiverySelectorUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/MusicPlayer.js';
 
     // 动态加载并运行JS代码
     function loadAndRunScript(url) {
@@ -475,5 +476,6 @@
     loadAndRunScript(FlightRcorderUrl);
     loadAndRunScript(VideoUrl);
     loadAndRunScript(LiverySelectorUrl);
+    loadAndRunScript(MusicPlayerUrl);
     console.log('GeoFS 插件加载器已启动');
 })();
