@@ -97,7 +97,7 @@ async function handleLiveryJson(data) {
         if (liveryobj.aircrafts[aircraftId].mp != "disabled")
             element.innerHTML += createTag('small', {
                 title: '涂装在多人游戏中兼容\n（其他玩家可见）'
-            }, '🎮').outerHTML;
+            }, '支持其他玩家看到你的涂装').outerHTML;
     });
 }
 
