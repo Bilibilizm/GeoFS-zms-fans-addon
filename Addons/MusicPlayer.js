@@ -3,12 +3,16 @@
 
     // 初始化变量
     let isDarkTheme = true;
-    let volume = 0.5;
+    let shortcutKey = 'A';
+    let volume = 0.5; 
+    let showButton = true; 
+    let showBottomBar = true; 
     let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-    let currentSongIndex = 0;
+    let currentSongIndex = 0; 
     let playMode = 'Sequential';
-    let currentPage = 1;
-    const itemsPerPage = 8;
+    let currentPage = 1; 
+    const itemsPerPage = 8; 
+    let language = 'en'; // 默认语言
 
     // 创建播放器容器
     const playerContainer = document.createElement('div');
@@ -21,157 +25,158 @@
     playerContainer.style.color = isDarkTheme ? '#fff' : '#000';
     playerContainer.style.zIndex = '1000';
     playerContainer.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.5)';
-    playerContainer.style.width = '400px';
-    playerContainer.style.height = 'auto';
+    playerContainer.style.width = '400px'; // 宽度调整为400px
+    playerContainer.style.height = '400px'; // 高度保持不变
     playerContainer.style.display = 'none'; // 默认隐藏
+    playerContainer.style.transition = 'opacity 0.3s ease';
 
-    // 标题
+    // 创建标题和副标题
     const title = document.createElement('div');
     title.innerText = 'GeoFS Music Player';
     title.style.fontSize = '20px';
     title.style.fontWeight = 'bold';
     title.style.marginBottom = '5px';
-    playerContainer.appendChild(title);
 
-    // 副标题
     const subtitle = document.createElement('div');
     subtitle.innerText = 'Made by 開飛機のzm';
     subtitle.style.fontSize = '12px';
     subtitle.style.color = isDarkTheme ? '#b3b3b3' : '#666';
     subtitle.style.marginBottom = '15px';
+
+    playerContainer.appendChild(title);
     playerContainer.appendChild(subtitle);
 
-    // 音频播放器
+    // 创建音乐按钮
+    const musicButton = document.createElement('button');
+    musicButton.innerText = '🎵';
+    musicButton.style.position = 'fixed';
+    musicButton.style.bottom = '20px';
+    musicButton.style.right = '20px';
+    musicButton.style.backgroundColor = '#1DB954';
+    musicButton.style.color = '#fff';
+    musicButton.style.border = 'none';
+    musicButton.style.borderRadius = '25px';
+    musicButton.style.padding = '10px 20px';
+    musicButton.style.cursor = 'pointer';
+    musicButton.style.zIndex = '1000';
+    musicButton.style.fontSize = '16px';
+    musicButton.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.2)';
+    musicButton.onclick = togglePlayer;
+
+    // 创建底部播放状态栏
+    const bottomBar = document.createElement('div');
+    bottomBar.style.position = 'fixed';
+    bottomBar.style.bottom = '0';
+    bottomBar.style.left = '0';
+    bottomBar.style.width = '100%';
+    bottomBar.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
+    bottomBar.style.color = isDarkTheme ? '#fff' : '#000';
+    bottomBar.style.padding = '10px';
+    bottomBar.style.textAlign = 'center';
+    bottomBar.style.zIndex = '999';
+    bottomBar.style.display = showBottomBar ? 'block' : 'none'; // 根据设置显示或隐藏
+    bottomBar.innerText = 'Now Playing: None';
+
+    // 创建播放器
     const audioPlayer = document.createElement('audio');
     audioPlayer.style.width = '100%';
     audioPlayer.volume = volume;
     playerContainer.appendChild(audioPlayer);
 
-    // 控制按钮
+    // 创建播放控制按钮
     const controls = document.createElement('div');
     controls.style.marginTop = '15px';
     controls.style.display = 'flex';
     controls.style.justifyContent = 'space-between';
     controls.style.alignItems = 'center';
 
-    const prevButton = document.createElement('button');
-    prevButton.innerText = '⏮';
-    prevButton.style.padding = '10px';
-    prevButton.style.backgroundColor = '#1DB954';
-    prevButton.style.color = '#fff';
-    prevButton.style.border = 'none';
-    prevButton.style.borderRadius = '5px';
-    prevButton.style.cursor = 'pointer';
-    prevButton.addEventListener('click', () => {
-        if (playMode === 'Shuffle') {
-            currentSongIndex = Math.floor(Math.random() * playlist.length);
-        } else {
-            currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
-        }
-        playSong(currentSongIndex);
-    });
+    const prevButton = createButton('⏮', playPrev);
+    const playPauseButton = createButton('⏯', togglePlayPause);
+    const nextButton = createButton('⏭', playNext);
+    const modeButton = createButton('🔀', togglePlayMode); // 播放模式按钮
+
     controls.appendChild(prevButton);
-
-    const playPauseButton = document.createElement('button');
-    playPauseButton.innerText = '⏯';
-    playPauseButton.style.padding = '10px';
-    playPauseButton.style.backgroundColor = '#1DB954';
-    playPauseButton.style.color = '#fff';
-    playPauseButton.style.border = 'none';
-    playPauseButton.style.borderRadius = '5px';
-    playPauseButton.style.cursor = 'pointer';
-    playPauseButton.addEventListener('click', () => {
-        if (audioPlayer.paused) {
-            audioPlayer.play();
-            playPauseButton.innerText = '⏸';
-        } else {
-            audioPlayer.pause();
-            playPauseButton.innerText = '⏯';
-        }
-    });
     controls.appendChild(playPauseButton);
-
-    const nextButton = document.createElement('button');
-    nextButton.innerText = '⏭';
-    nextButton.style.padding = '10px';
-    nextButton.style.backgroundColor = '#1DB954';
-    nextButton.style.color = '#fff';
-    nextButton.style.border = 'none';
-    nextButton.style.borderRadius = '5px';
-    nextButton.style.cursor = 'pointer';
-    nextButton.addEventListener('click', () => {
-        if (playMode === 'Shuffle') {
-            currentSongIndex = Math.floor(Math.random() * playlist.length);
-        } else {
-            currentSongIndex = (currentSongIndex + 1) % playlist.length;
-        }
-        playSong(currentSongIndex);
-    });
     controls.appendChild(nextButton);
+    controls.appendChild(modeButton);
 
     playerContainer.appendChild(controls);
 
-    // 歌单容器
+    // 创建进度条
+    const progressContainer = document.createElement('div');
+    progressContainer.style.marginTop = '15px';
+    progressContainer.style.width = '100%';
+    progressContainer.style.height = '5px';
+    progressContainer.style.backgroundColor = isDarkTheme ? '#333' : '#ddd';
+    progressContainer.style.borderRadius = '5px';
+    progressContainer.style.position = 'relative';
+    progressContainer.style.cursor = 'pointer';
+
+    const progressBar = document.createElement('div');
+    progressBar.style.width = '0%';
+    progressBar.style.height = '100%';
+    progressBar.style.backgroundColor = '#1DB954';
+    progressBar.style.borderRadius = '5px';
+    progressBar.style.position = 'absolute';
+    progressBar.style.top = '0';
+    progressBar.style.left = '0';
+
+    progressContainer.appendChild(progressBar);
+    playerContainer.appendChild(progressContainer);
+
+    // 创建时间显示
+    const timeDisplay = document.createElement('div');
+    timeDisplay.style.marginTop = '10px';
+    timeDisplay.style.display = 'flex';
+    timeDisplay.style.justifyContent = 'space-between';
+    timeDisplay.style.fontSize = '12px';
+    timeDisplay.style.color = isDarkTheme ? '#b3b3b3' : '#666';
+
+    const currentTime = document.createElement('span');
+    currentTime.innerText = '00:00';
+    const totalTime = document.createElement('span');
+    totalTime.innerText = '00:00';
+
+    timeDisplay.appendChild(currentTime);
+    timeDisplay.appendChild(totalTime);
+    playerContainer.appendChild(timeDisplay);
+
+    // 创建歌单容器
     const playlistContainer = document.createElement('div');
     playlistContainer.style.marginTop = '15px';
     playlistContainer.style.maxHeight = '200px';
     playlistContainer.style.overflowY = 'auto';
     playlistContainer.style.borderTop = `1px solid ${isDarkTheme ? '#333' : '#ddd'}`;
     playlistContainer.style.paddingTop = '10px';
+
     playerContainer.appendChild(playlistContainer);
 
-    // 分页按钮
+    // 创建分页按钮
     const paginationContainer = document.createElement('div');
     paginationContainer.style.marginTop = '10px';
     paginationContainer.style.display = 'flex';
     paginationContainer.style.justifyContent = 'center';
     paginationContainer.style.alignItems = 'center';
 
-    const prevPageButton = document.createElement('button');
-    prevPageButton.innerText = '◀';
-    prevPageButton.style.padding = '10px';
-    prevPageButton.style.backgroundColor = '#1DB954';
-    prevPageButton.style.color = '#fff';
-    prevPageButton.style.border = 'none';
-    prevPageButton.style.borderRadius = '5px';
-    prevPageButton.style.cursor = 'pointer';
-    prevPageButton.addEventListener('click', () => {
-        currentPage = Math.max(1, currentPage - 1);
-        updatePlaylist();
-    });
-    paginationContainer.appendChild(prevPageButton);
-
+    const prevPageButton = createButton('◀', () => changePage(-1));
+    const nextPageButton = createButton('▶', () => changePage(1));
     const pageInfo = document.createElement('span');
     pageInfo.style.margin = '0 10px';
     pageInfo.style.color = isDarkTheme ? '#b3b3b3' : '#666';
+
+    paginationContainer.appendChild(prevPageButton);
     paginationContainer.appendChild(pageInfo);
-
-    const nextPageButton = document.createElement('button');
-    nextPageButton.innerText = '▶';
-    nextPageButton.style.padding = '10px';
-    nextPageButton.style.backgroundColor = '#1DB954';
-    nextPageButton.style.color = '#fff';
-    nextPageButton.style.border = 'none';
-    nextPageButton.style.borderRadius = '5px';
-    nextPageButton.style.cursor = 'pointer';
-    nextPageButton.addEventListener('click', () => {
-        currentPage += 1;
-        updatePlaylist();
-    });
     paginationContainer.appendChild(nextPageButton);
-
     playerContainer.appendChild(paginationContainer);
 
+    // 创建导入文件和设置按钮的容器
+    const utilityButtonsContainer = document.createElement('div');
+    utilityButtonsContainer.style.marginTop = '10px';
+    utilityButtonsContainer.style.display = 'flex';
+    utilityButtonsContainer.style.justifyContent = 'space-between';
+
     // 导入文件按钮
-    const importButton = document.createElement('button');
-    importButton.innerText = 'Import Files';
-    importButton.style.padding = '10px';
-    importButton.style.backgroundColor = '#1DB954';
-    importButton.style.color = '#fff';
-    importButton.style.border = 'none';
-    importButton.style.borderRadius = '5px';
-    importButton.style.cursor = 'pointer';
-    importButton.addEventListener('click', () => {
+    const importPlaylistButton = createButton('Import Files', () => {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.mp3,.mp4';
@@ -180,30 +185,40 @@
             const files = e.target.files;
             if (files.length > 0) {
                 Array.from(files).forEach((file) => {
-                    const url = URL.createObjectURL(file);
-                    playlist.push({ name: file.name, file: url });
+                    if (checkFileSize(file)) {
+                        const url = URL.createObjectURL(file);
+                        playlist.push({ name: file.name, file: url });
+                    }
                 });
                 updatePlaylist();
-                savePlaylistToLocal();
+                savePlaylistToLocal(); // 保存到本地存储
             }
         };
         input.click();
     });
-    playerContainer.appendChild(importButton);
 
     // 设置按钮
-    const settingsButton = document.createElement('button');
-    settingsButton.innerText = 'Settings';
-    settingsButton.style.padding = '10px';
-    settingsButton.style.backgroundColor = '#1DB954';
-    settingsButton.style.color = '#fff';
-    settingsButton.style.border = 'none';
-    settingsButton.style.borderRadius = '5px';
-    settingsButton.style.cursor = 'pointer';
-    settingsButton.addEventListener('click', () => {
-        toggleSettings();
-    });
-    playerContainer.appendChild(settingsButton);
+    const settingsButton = createButton('Settings', toggleSettings);
+
+    utilityButtonsContainer.appendChild(importPlaylistButton);
+    utilityButtonsContainer.appendChild(settingsButton);
+    playerContainer.appendChild(utilityButtonsContainer);
+
+    // 更新分页显示
+    function updatePagination() {
+        const totalPages = Math.ceil(playlist.length / itemsPerPage);
+        pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+        prevPageButton.disabled = currentPage === 1;
+        nextPageButton.disabled = currentPage === totalPages;
+    }
+
+    // 切换分页
+    function changePage(direction) {
+        const totalPages = Math.ceil(playlist.length / itemsPerPage);
+        currentPage = Math.max(1, Math.min(totalPages, currentPage + direction));
+        updatePlaylist();
+        updatePagination();
+    }
 
     // 更新歌单显示
     function updatePlaylist() {
@@ -240,14 +255,6 @@
         updatePagination();
     }
 
-    // 更新分页显示
-    function updatePagination() {
-        const totalPages = Math.ceil(playlist.length / itemsPerPage);
-        pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
-        prevPageButton.disabled = currentPage === 1;
-        nextPageButton.disabled = currentPage === totalPages;
-    }
-
     // 播放歌曲
     function playSong(index) {
         currentSongIndex = index;
@@ -257,11 +264,343 @@
             audioPlayer.play()
                 .then(() => {
                     playPauseButton.innerText = '⏸';
+                    bottomBar.innerText = `Now Playing: ${song.name}`;
+                    bottomBar.style.display = showBottomBar ? 'block' : 'none';
                 })
                 .catch((error) => {
+                    alert(`Failed to play the file: ${error.message}`);
                     console.error('Playback error:', error);
                 });
         }
+    }
+
+    // 播放控制
+    function togglePlayPause() {
+        if (audioPlayer.paused) {
+            audioPlayer.play();
+            playPauseButton.innerText = '⏸';
+        } else {
+            audioPlayer.pause();
+            playPauseButton.innerText = '⏯';
+        }
+    }
+
+    function playPrev() {
+        if (playMode === 'Shuffle') {
+            currentSongIndex = Math.floor(Math.random() * playlist.length);
+        } else {
+            currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+        }
+        playSong(currentSongIndex);
+    }
+
+    function playNext() {
+        if (playMode === 'Shuffle') {
+            currentSongIndex = Math.floor(Math.random() * playlist.length);
+        } else {
+            currentSongIndex = (currentSongIndex + 1) % playlist.length;
+        }
+        playSong(currentSongIndex);
+    }
+
+    function togglePlayMode() {
+        const modes = ['Sequential', 'Shuffle', 'Loop'];
+        const currentIndex = modes.indexOf(playMode);
+        playMode = modes[(currentIndex + 1) % modes.length];
+        modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
+        audioPlayer.loop = playMode === 'Loop';
+    }
+
+    // 进度条更新
+    audioPlayer.addEventListener('timeupdate', () => {
+        const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+        progressBar.style.width = `${progress}%`;
+        currentTime.innerText = formatTime(audioPlayer.currentTime);
+        totalTime.innerText = formatTime(audioPlayer.duration);
+    });
+
+    // 拖动进度条
+    progressContainer.addEventListener('click', (e) => {
+        const rect = progressContainer.getBoundingClientRect();
+        const clickPosition = (e.clientX - rect.left) / rect.width;
+        audioPlayer.currentTime = clickPosition * audioPlayer.duration;
+    });
+
+    // 格式化时间
+    function formatTime(seconds) {
+        const min = Math.floor(seconds / 60);
+        const sec = Math.floor(seconds % 60);
+        return `${min}:${sec < 10 ? '0' : ''}${sec}`;
+    }
+
+    // 自动播放下一首
+    audioPlayer.addEventListener('ended', () => {
+        if (playMode !== 'Loop') {
+            playNext();
+        }
+    });
+
+    // 拖动功能优化
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    // 创建拖动点
+    const dragHandle = document.createElement('div');
+    dragHandle.style.position = 'absolute';
+    dragHandle.style.bottom = '5px';
+    dragHandle.style.right = '5px';
+    dragHandle.style.width = '10px';
+    dragHandle.style.height = '10px';
+    dragHandle.style.backgroundColor = isDarkTheme ? '#b3b3b3' : '#666';
+    dragHandle.style.borderRadius = '50%';
+    dragHandle.style.cursor = 'move';
+    dragHandle.style.zIndex = '1001';
+    playerContainer.appendChild(dragHandle);
+
+    dragHandle.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        offsetX = e.clientX - playerContainer.getBoundingClientRect().left;
+        offsetY = e.clientY - playerContainer.getBoundingClientRect().top;
+        playerContainer.style.opacity = '0.8';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (isDragging) {
+            const x = e.clientX - offsetX;
+            const y = e.clientY - offsetY;
+            playerContainer.style.left = `${Math.max(0, Math.min(window.innerWidth - playerContainer.offsetWidth, x))}px`;
+            playerContainer.style.top = `${Math.max(0, Math.min(window.innerHeight - playerContainer.offsetHeight, y))}px`;
+        }
+    });
+
+    document.addEventListener('mouseup', () => {
+        isDragging = false;
+        playerContainer.style.opacity = '1';
+    });
+
+    // 打开/关闭设置界面
+    function toggleSettings() {
+        const settingsContainer = document.querySelector('.settings-container');
+        if (settingsContainer) {
+            settingsContainer.remove();
+            playlistContainer.style.display = 'block'; // 恢复歌单显示
+        } else {
+            openSettings();
+        }
+    }
+
+    // 打开设置界面
+    function openSettings() {
+        // 隐藏歌单界面
+        playlistContainer.style.display = 'none';
+
+        // 创建设置界面
+        const settingsContainer = document.createElement('div');
+        settingsContainer.className = 'settings-container';
+        settingsContainer.style.marginTop = '15px';
+
+        // 主题切换
+        const themeButton = createButton(`Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`, () => {
+            isDarkTheme = !isDarkTheme;
+            updateTheme();
+            themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
+        });
+
+        // 快捷键修改
+        const shortcutButton = createButton(`Change Shortcut (Current: ${shortcutKey})`, () => {
+            shortcutKey = prompt('Enter new shortcut key (e.g., M):');
+            updateShortcut();
+            shortcutButton.innerText = `Change Shortcut (Current: ${shortcutKey})`;
+        });
+
+        // 是否显示点击式按钮
+        const showButtonToggle = createButton(`Show Button (Current: ${showButton ? 'Yes' : 'No'})`, () => {
+            showButton = !showButton;
+            musicButton.style.display = showButton ? 'block' : 'none';
+            showButtonToggle.innerText = `Show Button (Current: ${showButton ? 'Yes' : 'No'})`;
+        });
+
+        // 是否显示底部播放状态栏
+        const showBottomBarToggle = createButton(`Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`, () => {
+            showBottomBar = !showBottomBar;
+            bottomBar.style.display = showBottomBar ? 'block' : 'none';
+            showBottomBarToggle.innerText = `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`;
+        });
+
+        // 语言切换
+        const languageButton = createButton(`Language (Current: ${language === 'en' ? 'English' : '中文'})`, () => {
+            language = language === 'en' ? 'zh' : 'en';
+            updateLanguage();
+            languageButton.innerText = `Language (Current: ${language === 'en' ? 'English' : '中文'})`;
+        });
+
+        // 导出歌单
+        const exportButton = createButton('Export Playlist', () => {
+            const blob = new Blob([JSON.stringify(playlist)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'playlist.json';
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        // 导入歌单
+        const importPlaylistButton = createButton('Import Playlist', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        try {
+                            const importedPlaylist = JSON.parse(event.target.result);
+                            if (Array.isArray(importedPlaylist)) {
+                                playlist = importedPlaylist;
+                                updatePlaylist();
+                                savePlaylistToLocal();
+                                alert('Playlist imported successfully!');
+                            } else {
+                                alert('Invalid playlist format. Please ensure the file is a valid JSON array.');
+                            }
+                        } catch (error) {
+                            alert('Failed to parse the playlist file. Please check the file format.');
+                        }
+                    };
+                    reader.readAsText(file);
+                }
+            };
+            input.click();
+        });
+
+        // 关闭设置界面按钮
+        const closeButton = createButton('Close', toggleSettings);
+        closeButton.style.position = 'absolute';
+        closeButton.style.top = '5px';
+        closeButton.style.right = '5px';
+
+        // 将按钮添加到设置界面
+        settingsContainer.appendChild(themeButton);
+        settingsContainer.appendChild(shortcutButton);
+        settingsContainer.appendChild(showButtonToggle);
+        settingsContainer.appendChild(showBottomBarToggle);
+        settingsContainer.appendChild(languageButton);
+        settingsContainer.appendChild(exportButton);
+        settingsContainer.appendChild(importPlaylistButton);
+        settingsContainer.appendChild(closeButton);
+
+        // 将设置界面添加到播放器容器
+        playerContainer.appendChild(settingsContainer);
+    }
+
+    // 更新主题
+    function updateTheme() {
+        // 更新播放器容器的背景色和文字颜色
+        playerContainer.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
+        playerContainer.style.color = isDarkTheme ? '#fff' : '#000';
+
+        // 更新底部播放状态栏的背景色和文字颜色
+        bottomBar.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
+        bottomBar.style.color = isDarkTheme ? '#fff' : '#000';
+
+        // 更新进度条和拖动点的颜色
+        progressContainer.style.backgroundColor = isDarkTheme ? '#333' : '#ddd';
+        dragHandle.style.backgroundColor = isDarkTheme ? '#b3b3b3' : '#666';
+
+        // 更新时间显示的颜色
+        timeDisplay.style.color = isDarkTheme ? '#b3b3b3' : '#666';
+
+        // 更新歌单容器的边框颜色
+        playlistContainer.style.borderTop = `1px solid ${isDarkTheme ? '#333' : '#ddd'}`;
+
+        // 更新所有插件内部按钮的样式
+        const pluginButtons = playerContainer.querySelectorAll('button');
+        pluginButtons.forEach(button => {
+            if (button !== musicButton) { // 排除点击式按钮
+                button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0';
+                button.style.color = isDarkTheme ? '#b3b3b3' : '#333';
+                button.onmouseleave = () => (button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0');
+            }
+        });
+    }
+
+    // 更新语言
+    function updateLanguage() {
+        if (language === 'zh') {
+            title.innerText = 'GeoFS音乐播放器';
+            subtitle.innerText = '由開飛機のzm制作';
+            musicButton.innerText = '🎵';
+            playPauseButton.innerText = audioPlayer.paused ? '▶' : '⏸';
+            modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
+            prevButton.innerText = '⏮';
+            nextButton.innerText = '⏭';
+            importPlaylistButton.innerText = '导入文件';
+            settingsButton.innerText = '设置';
+            themeButton.innerText = `切换主题 (当前: ${isDarkTheme ? '暗色' : '亮色'})`;
+            shortcutButton.innerText = `更改快捷键 (当前: ${shortcutKey})`;
+            showButtonToggle.innerText = `显示按钮 (当前: ${showButton ? '是' : '否'})`;
+            showBottomBarToggle.innerText = `显示底部播放状态栏 (当前: ${showBottomBar ? '是' : '否'})`;
+            languageButton.innerText = `语言 (当前: 中文)`;
+            exportButton.innerText = '导出歌单';
+            importPlaylistButton.innerText = '导入歌单';
+            closeButton.innerText = '关闭';
+        } else {
+            title.innerText = 'GeoFS Music Player';
+            subtitle.innerText = 'Made by 開飛機のzm';
+            musicButton.innerText = '🎵';
+            playPauseButton.innerText = audioPlayer.paused ? '▶' : '⏸';
+            modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
+            prevButton.innerText = '⏮';
+            nextButton.innerText = '⏭';
+            importPlaylistButton.innerText = 'Import Files';
+            settingsButton.innerText = 'Settings';
+            themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
+            shortcutButton.innerText = `Change Shortcut (Current: ${shortcutKey})`;
+            showButtonToggle.innerText = `Show Button (Current: ${showButton ? 'Yes' : 'No'})`;
+            showBottomBarToggle.innerText = `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`;
+            languageButton.innerText = `Language (Current: English)`;
+            exportButton.innerText = 'Export Playlist';
+            importPlaylistButton.innerText = 'Import Playlist';
+            closeButton.innerText = 'Close';
+        }
+    }
+
+    // 更新快捷键
+    function updateShortcut() {
+        document.removeEventListener('keydown', handleShortcut);
+        document.addEventListener('keydown', handleShortcut);
+    }
+
+    // 快捷键处理
+    function handleShortcut(e) {
+        if (e.key.toUpperCase() === shortcutKey.toUpperCase()) {
+            togglePlayer();
+        }
+    }
+
+    // 切换播放器显示
+    function togglePlayer() {
+        playerContainer.style.display = playerContainer.style.display === 'none' ? 'block' : 'none';
+        bottomBar.style.display = playerContainer.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // 创建按钮的辅助函数
+    function createButton(text, onClick) {
+        const button = document.createElement('button');
+        button.innerText = text;
+        button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0'; // 浅色主题按钮背景色
+        button.style.color = isDarkTheme ? '#b3b3b3' : '#333'; // 浅色主题按钮文字颜色
+        button.style.border = 'none';
+        button.style.borderRadius = '5px';
+        button.style.padding = '8px 12px';
+        button.style.cursor = 'pointer';
+        button.style.transition = 'background 0.2s ease';
+        button.onclick = onClick;
+        button.onmouseenter = () => (button.style.backgroundColor = '#1DB954');
+        button.onmouseleave = () => (button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0');
+        return button;
     }
 
     // 保存歌单到本地存储
@@ -283,11 +622,11 @@
         contextMenu.style.zIndex = '1001';
 
         const renameOption = document.createElement('div');
-        renameOption.innerText = 'Rename';
+        renameOption.innerText = language === 'zh' ? '重命名' : 'Rename';
         renameOption.style.cursor = 'pointer';
         renameOption.style.padding = '4px';
         renameOption.onclick = () => {
-            const newName = prompt('Enter new name:', playlist[index].name);
+            const newName = prompt(language === 'zh' ? '输入新名称:' : 'Enter new name:', playlist[index].name);
             if (newName) {
                 playlist[index].name = newName;
                 updatePlaylist();
@@ -295,10 +634,9 @@
             }
             contextMenu.remove();
         };
-        contextMenu.appendChild(renameOption);
 
         const deleteOption = document.createElement('div');
-        deleteOption.innerText = 'Delete';
+        deleteOption.innerText = language === 'zh' ? '删除' : 'Delete';
         deleteOption.style.cursor = 'pointer';
         deleteOption.style.padding = '4px';
         deleteOption.onclick = () => {
@@ -307,10 +645,12 @@
             savePlaylistToLocal();
             contextMenu.remove();
         };
-        contextMenu.appendChild(deleteOption);
 
+        contextMenu.appendChild(renameOption);
+        contextMenu.appendChild(deleteOption);
         document.body.appendChild(contextMenu);
 
+        // 点击其他地方关闭右键菜单
         document.addEventListener('click', () => contextMenu.remove(), { once: true });
     }
 
@@ -322,58 +662,24 @@
         savePlaylistToLocal();
     }
 
-    // 切换设置界面
-    function toggleSettings() {
-        const settingsContainer = document.querySelector('.settings-container');
-        if (settingsContainer) {
-            settingsContainer.remove();
-            playlistContainer.style.display = 'block';
-        } else {
-            openSettings();
+    // 文件大小限制
+    function checkFileSize(file) {
+        const maxSize = 20 * 1024 * 1024; // 20MB
+        if (file.size > maxSize) {
+            alert(language === 'zh' ? '文件大小超过20MB。请选择较小的文件。' : 'File size exceeds 20MB. Please choose a smaller file.');
+            return false;
         }
-    }
-
-    // 打开设置界面
-    function openSettings() {
-        playlistContainer.style.display = 'none';
-
-        const settingsContainer = document.createElement('div');
-        settingsContainer.className = 'settings-container';
-        settingsContainer.style.marginTop = '15px';
-
-        // 主题切换
-        const themeButton = document.createElement('button');
-        themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
-        themeButton.style.padding = '10px';
-        themeButton.style.backgroundColor = '#1DB954';
-        themeButton.style.color = '#fff';
-        themeButton.style.border = 'none';
-        themeButton.style.borderRadius = '5px';
-        themeButton.style.cursor = 'pointer';
-        themeButton.addEventListener('click', () => {
-            isDarkTheme = !isDarkTheme;
-            updateTheme();
-            themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
-        });
-        settingsContainer.appendChild(themeButton);
-
-        // 更新主题
-        function updateTheme() {
-            playerContainer.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
-            playerContainer.style.color = isDarkTheme ? '#fff' : '#000';
-            bottomBar.style.backgroundColor = isDarkTheme ? '#181818' : '#fff';
-            bottomBar.style.color = isDarkTheme ? '#fff' : '#000';
-            playlistContainer.style.borderTop = `1px solid ${isDarkTheme ? '#333' : '#ddd'}`;
-            timeDisplay.style.color = isDarkTheme ? '#b3b3b3' : '#666';
-        }
-
-        playerContainer.appendChild(settingsContainer);
+        return true;
     }
 
     // 添加到页面
+    document.body.appendChild(musicButton);
     document.body.appendChild(playerContainer);
     document.body.appendChild(bottomBar);
 
     // 初始化
     updatePlaylist();
+    updateShortcut();
+    updateTheme();
+    updateLanguage();
 })();
