@@ -58,9 +58,10 @@
       "name": "检查单",
       "key": "L"
     },
-        {
+    {
       "name": "飞行状态显示器",
       "key": "W"
     }
-  ]
+  ],
+  "collaborators": ["zm."]
 }
