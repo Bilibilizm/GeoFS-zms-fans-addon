@@ -8,7 +8,7 @@
     // 语言文本
     const texts = {
         '简体中文': {
-            'menuTitle': 'GeoFS 飞行记录器（zm粉丝专属豪华至尊超级牛逼puls pro版）',
+            'menuTitle': '【I】GeoFS 飞行记录器（zm粉丝专属豪华至尊超级牛逼puls pro版）',
             'language': '语言',
             'previousFlights': '历史飞行',
             'import': '导入',
