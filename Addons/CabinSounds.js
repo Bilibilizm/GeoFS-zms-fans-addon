@@ -75,7 +75,7 @@
     document.body.appendChild(soundMenu);
 
     var menuTitle = document.createElement('h1');
-    menuTitle.textContent = 'GeoFS客舱广播插件（zm粉丝专属版）';
+    menuTitle.textContent = '【D】GeoFS客舱广播插件（zm粉丝专属版）';
     menuTitle.style.fontSize = '18px';
     menuTitle.style.marginBottom = '10px';
     soundMenu.appendChild(menuTitle);
