@@ -307,7 +307,7 @@
 
     // 互动部分
     const interaction = document.createElement('h3');
-    interaction.innerText = '互动';
+    interaction.innerText = '其他';
     interaction.style.fontSize = '16px';
 
     const memberButton = document.createElement('button');
