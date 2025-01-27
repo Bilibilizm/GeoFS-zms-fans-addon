@@ -615,6 +615,7 @@
     const LiverySelectorUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/LiverySelector.js';
     const MusicPlayerUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/MusicPlayer.js';
     const showUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/show.js';
+    const timeUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/time.js';
 
     // 动态加载并运行JS代码
     function loadAndRunScript(url) {
@@ -644,5 +645,6 @@
     loadAndRunScript(LiverySelectorUrl);
     loadAndRunScript(MusicPlayerUrl);
     loadAndRunScript(showUrl);
+    loadAndRunScript(timeUrl);
     console.log('GeoFS 插件加载器已启动');
 })();
