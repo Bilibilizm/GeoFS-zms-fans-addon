@@ -20,7 +20,7 @@
     // 标题和作者信息
     const titles = {
         'zh-CN': {
-            title: 'GeoFS 飞行检查单（zm粉丝专属版）',
+            title: '【L】GeoFS 飞行检查单（zm粉丝专属版）',
             author: '作者: 開飛機のzm',
             opacityLabel: '透明度',
             fontSizeLabel: '字体大小',
