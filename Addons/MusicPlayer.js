@@ -44,13 +44,13 @@
 
     // 创建标题和副标题
     const title = document.createElement('div');
-    title.innerText = 'GeoFS音乐播放器';
+    title.innerText = 'GeoFS音乐播放器（zm粉丝专属版）';
     title.style.fontSize = '20px';
     title.style.fontWeight = 'bold';
     title.style.marginBottom = '5px';
 
     const subtitle = document.createElement('div');
-    subtitle.innerText = '由開飛機のzm制作';
+    subtitle.innerText = '開飛機のzm制作';
     subtitle.style.fontSize = '12px';
     subtitle.style.color = isDarkTheme ? '#b3b3b3' : '#666';
     subtitle.style.marginBottom = '15px';
