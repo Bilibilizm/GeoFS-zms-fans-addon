@@ -255,6 +255,56 @@
     const pluginMessageText = document.createElement('p');
     pluginMessageText.innerText = data.pluginMessage;
 
+    // 插件按钮
+    const pluginButtonsTitle = document.createElement('h3');
+    pluginButtonsTitle.innerText = '插件按钮';
+    pluginButtonsTitle.style.marginTop = '20px';
+    pluginButtonsTitle.style.fontSize = '16px';
+
+    // 创建插件按钮
+    const pluginButtonsContainer = document.createElement('div');
+    pluginButtonsContainer.style.display = 'flex';
+    pluginButtonsContainer.style.flexDirection = 'column';
+    pluginButtonsContainer.style.marginTop = '10px';
+
+    data.plugins.forEach(plugin => {
+      const pluginButton = document.createElement('button');
+      pluginButton.innerText = plugin.name;
+      pluginButton.style.marginBottom = '10px';
+      pluginButton.style.backgroundColor = '#00a1d6';
+      pluginButton.style.border = 'none';
+      pluginButton.style.color = '#ffffff';
+      pluginButton.style.padding = '10px 20px';
+      pluginButton.style.borderRadius = '5px';
+      pluginButton.style.cursor = 'pointer';
+      pluginButton.style.transition = 'background-color 0.3s ease';
+      pluginButton.addEventListener('mouseenter', () => {
+        pluginButton.style.backgroundColor = '#008cba';
+      });
+      pluginButton.addEventListener('mouseleave', () => {
+        pluginButton.style.backgroundColor = '#00a1d6';
+      });
+
+      // 模拟快捷键
+      pluginButton.addEventListener('click', () => {
+        const key = plugin.key;
+        if (key === 'd') { 
+          // 直接调用 D 键的功能函数
+          if (typeof openCabinSounds === 'function') {
+            openCabinSounds();
+          } else {
+            console.error('openCabinSounds function is not defined');
+          }
+        } else {
+          // 模拟其他快捷键
+          const keyEvent = new KeyboardEvent('keydown', { key: key });
+          document.dispatchEvent(keyEvent);
+        }
+      });
+
+      pluginButtonsContainer.appendChild(pluginButton);
+    });
+
     // 互动部分
     const interaction = document.createElement('h3');
     interaction.innerText = '互动';
@@ -392,6 +442,8 @@
     pluginContainer.appendChild(updateText);
     pluginContainer.appendChild(pluginMessageTitle);
     pluginContainer.appendChild(pluginMessageText);
+    pluginContainer.appendChild(pluginButtonsTitle);
+    pluginContainer.appendChild(pluginButtonsContainer);
     pluginContainer.appendChild(interaction);
     pluginContainer.appendChild(memberButton);
     pluginContainer.appendChild(leaderboardButton);
