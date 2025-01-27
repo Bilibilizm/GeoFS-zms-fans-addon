@@ -12,7 +12,18 @@
     let playMode = 'Sequential';
     let currentPage = 1; 
     const itemsPerPage = 8; 
-    let language = 'en'; // 默认语言
+
+    // 定义文件大小限制为150MB
+    const MAX_FILE_SIZE = 150 * 1024 * 1024; // 150MB
+
+    // 文件大小限制检查函数
+    function checkFileSize(file) {
+        if (file.size > MAX_FILE_SIZE) {
+            alert('文件大小超过150MB。请选择较小的文件。');
+            return false;
+        }
+        return true;
+    }
 
     // 创建播放器容器
     const playerContainer = document.createElement('div');
@@ -29,16 +40,17 @@
     playerContainer.style.height = '400px'; // 高度保持不变
     playerContainer.style.display = 'none'; // 默认隐藏
     playerContainer.style.transition = 'opacity 0.3s ease';
+    playerContainer.style.overflowY = 'auto'; // 添加滚动条
 
     // 创建标题和副标题
     const title = document.createElement('div');
-    title.innerText = 'GeoFS Music Player';
+    title.innerText = 'GeoFS音乐播放器';
     title.style.fontSize = '20px';
     title.style.fontWeight = 'bold';
     title.style.marginBottom = '5px';
 
     const subtitle = document.createElement('div');
-    subtitle.innerText = 'Made by 開飛機のzm';
+    subtitle.innerText = '由開飛機のzm制作';
     subtitle.style.fontSize = '12px';
     subtitle.style.color = isDarkTheme ? '#b3b3b3' : '#666';
     subtitle.style.marginBottom = '15px';
@@ -75,7 +87,7 @@
     bottomBar.style.textAlign = 'center';
     bottomBar.style.zIndex = '999';
     bottomBar.style.display = showBottomBar ? 'block' : 'none'; // 根据设置显示或隐藏
-    bottomBar.innerText = 'Now Playing: None';
+    bottomBar.innerText = '正在播放: None';
 
     // 创建播放器
     const audioPlayer = document.createElement('audio');
@@ -93,7 +105,7 @@
     const prevButton = createButton('⏮', playPrev);
     const playPauseButton = createButton('⏯', togglePlayPause);
     const nextButton = createButton('⏭', playNext);
-    const modeButton = createButton('🔀', togglePlayMode); // 播放模式按钮
+    const modeButton = createButton('➡️', togglePlayMode); // 播放模式按钮
 
     controls.appendChild(prevButton);
     controls.appendChild(playPauseButton);
@@ -176,7 +188,7 @@
     utilityButtonsContainer.style.justifyContent = 'space-between';
 
     // 导入文件按钮
-    const importPlaylistButton = createButton('Import Files', () => {
+    const importPlaylistButton = createButton('导入文件', () => {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = '.mp3,.mp4';
@@ -198,7 +210,7 @@
     });
 
     // 设置按钮
-    const settingsButton = createButton('Settings', toggleSettings);
+    const settingsButton = createButton('设置', toggleSettings);
 
     utilityButtonsContainer.appendChild(importPlaylistButton);
     utilityButtonsContainer.appendChild(settingsButton);
@@ -207,7 +219,7 @@
     // 更新分页显示
     function updatePagination() {
         const totalPages = Math.ceil(playlist.length / itemsPerPage);
-        pageInfo.innerText = `Page ${currentPage} of ${totalPages}`;
+        pageInfo.innerText = `第 ${currentPage} 页，共 ${totalPages} 页`;
         prevPageButton.disabled = currentPage === 1;
         nextPageButton.disabled = currentPage === totalPages;
     }
@@ -264,11 +276,11 @@
             audioPlayer.play()
                 .then(() => {
                     playPauseButton.innerText = '⏸';
-                    bottomBar.innerText = `Now Playing: ${song.name}`;
+                    bottomBar.innerText = `正在播放: ${song.name}`;
                     bottomBar.style.display = showBottomBar ? 'block' : 'none';
                 })
                 .catch((error) => {
-                    alert(`Failed to play the file: ${error.message}`);
+                    alert(`播放文件失败: ${error.message}`);
                     console.error('Playback error:', error);
                 });
         }
@@ -304,10 +316,10 @@
     }
 
     function togglePlayMode() {
-        const modes = ['Sequential', 'Shuffle', 'Loop'];
+        const modes = ['Sequential', 'Shuffle', 'Loop', 'ListLoop']; // 添加 'ListLoop' 模式
         const currentIndex = modes.indexOf(playMode);
         playMode = modes[(currentIndex + 1) % modes.length];
-        modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
+        modeButton.innerText = playMode === 'Loop' ? '🔂' : playMode === 'Shuffle' ? '🔀' : playMode === 'ListLoop' ? '🔁' : '➡️';
         audioPlayer.loop = playMode === 'Loop';
     }
 
@@ -335,7 +347,9 @@
 
     // 自动播放下一首
     audioPlayer.addEventListener('ended', () => {
-        if (playMode !== 'Loop') {
+        if (playMode === 'ListLoop') {
+            playNext();
+        } else if (playMode !== 'Loop') {
             playNext();
         }
     });
@@ -400,42 +414,49 @@
         settingsContainer.style.marginTop = '15px';
 
         // 主题切换
-        const themeButton = createButton(`Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`, () => {
+        const themeButton = createButton('切换主题 (当前: 暗色)', () => {
             isDarkTheme = !isDarkTheme;
             updateTheme();
-            themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
+            themeButton.innerText = `切换主题 (当前: ${isDarkTheme ? '暗色' : '亮色'})`;
         });
 
         // 快捷键修改
-        const shortcutButton = createButton(`Change Shortcut (Current: ${shortcutKey})`, () => {
-            shortcutKey = prompt('Enter new shortcut key (e.g., M):');
+        const shortcutButton = createButton(`更改快捷键 (当前: ${shortcutKey})`, () => {
+            shortcutKey = prompt('输入新的快捷键 (例如, M):');
             updateShortcut();
-            shortcutButton.innerText = `Change Shortcut (Current: ${shortcutKey})`;
+            shortcutButton.innerText = `更改快捷键 (当前: ${shortcutKey})`;
         });
 
         // 是否显示点击式按钮
-        const showButtonToggle = createButton(`Show Button (Current: ${showButton ? 'Yes' : 'No'})`, () => {
+        const showButtonToggle = createButton(`显示按钮 (当前: ${showButton ? '是' : '否'})`, () => {
             showButton = !showButton;
             musicButton.style.display = showButton ? 'block' : 'none';
-            showButtonToggle.innerText = `Show Button (Current: ${showButton ? 'Yes' : 'No'})`;
+            showButtonToggle.innerText = `显示按钮 (当前: ${showButton ? '是' : '否'})`;
         });
 
         // 是否显示底部播放状态栏
-        const showBottomBarToggle = createButton(`Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`, () => {
+        const showBottomBarToggle = createButton(`显示底部播放状态栏 (当前: ${showBottomBar ? '是' : '否'})`, () => {
             showBottomBar = !showBottomBar;
             bottomBar.style.display = showBottomBar ? 'block' : 'none';
-            showBottomBarToggle.innerText = `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`;
+            showBottomBarToggle.innerText = `显示底部播放状态栏 (当前: ${showBottomBar ? '是' : '否'})`;
         });
 
-        // 语言切换
-        const languageButton = createButton(`Language (Current: ${language === 'en' ? 'English' : '中文'})`, () => {
-            language = language === 'en' ? 'zh' : 'en';
-            updateLanguage();
-            languageButton.innerText = `Language (Current: ${language === 'en' ? 'English' : '中文'})`;
-        });
+        // 音量控制
+        const volumeControl = document.createElement('input');
+        volumeControl.type = 'range';
+        volumeControl.min = '0';
+        volumeControl.max = '1';
+        volumeControl.step = '0.1';
+        volumeControl.value = volume;
+        volumeControl.style.width = '100%';
+        volumeControl.style.marginTop = '10px';
+        volumeControl.oninput = () => {
+            volume = parseFloat(volumeControl.value);
+            audioPlayer.volume = volume;
+        };
 
         // 导出歌单
-        const exportButton = createButton('Export Playlist', () => {
+        const exportButton = createButton('导出歌单', () => {
             const blob = new Blob([JSON.stringify(playlist)], { type: 'application/json' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
@@ -446,7 +467,7 @@
         });
 
         // 导入歌单
-        const importPlaylistButton = createButton('Import Playlist', () => {
+        const importPlaylistButton = createButton('导入歌单', () => {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
@@ -461,12 +482,12 @@
                                 playlist = importedPlaylist;
                                 updatePlaylist();
                                 savePlaylistToLocal();
-                                alert('Playlist imported successfully!');
+                                alert('歌单导入成功！');
                             } else {
-                                alert('Invalid playlist format. Please ensure the file is a valid JSON array.');
+                                alert('无效的歌单格式。请确保文件是一个有效的JSON数组。');
                             }
                         } catch (error) {
-                            alert('Failed to parse the playlist file. Please check the file format.');
+                            alert('解析歌单文件失败。请检查文件格式。');
                         }
                     };
                     reader.readAsText(file);
@@ -476,7 +497,7 @@
         });
 
         // 关闭设置界面按钮
-        const closeButton = createButton('Close', toggleSettings);
+        const closeButton = createButton('关闭', toggleSettings);
         closeButton.style.position = 'absolute';
         closeButton.style.top = '5px';
         closeButton.style.right = '5px';
@@ -486,7 +507,7 @@
         settingsContainer.appendChild(shortcutButton);
         settingsContainer.appendChild(showButtonToggle);
         settingsContainer.appendChild(showBottomBarToggle);
-        settingsContainer.appendChild(languageButton);
+        settingsContainer.appendChild(volumeControl);
         settingsContainer.appendChild(exportButton);
         settingsContainer.appendChild(importPlaylistButton);
         settingsContainer.appendChild(closeButton);
@@ -524,47 +545,6 @@
                 button.onmouseleave = () => (button.style.backgroundColor = isDarkTheme ? '#333' : '#f0f0f0');
             }
         });
-    }
-
-    // 更新语言
-    function updateLanguage() {
-        if (language === 'zh') {
-            title.innerText = 'GeoFS音乐播放器';
-            subtitle.innerText = '由開飛機のzm制作';
-            musicButton.innerText = '🎵';
-            playPauseButton.innerText = audioPlayer.paused ? '▶' : '⏸';
-            modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
-            prevButton.innerText = '⏮';
-            nextButton.innerText = '⏭';
-            importPlaylistButton.innerText = '导入文件';
-            settingsButton.innerText = '设置';
-            themeButton.innerText = `切换主题 (当前: ${isDarkTheme ? '暗色' : '亮色'})`;
-            shortcutButton.innerText = `更改快捷键 (当前: ${shortcutKey})`;
-            showButtonToggle.innerText = `显示按钮 (当前: ${showButton ? '是' : '否'})`;
-            showBottomBarToggle.innerText = `显示底部播放状态栏 (当前: ${showBottomBar ? '是' : '否'})`;
-            languageButton.innerText = `语言 (当前: 中文)`;
-            exportButton.innerText = '导出歌单';
-            importPlaylistButton.innerText = '导入歌单';
-            closeButton.innerText = '关闭';
-        } else {
-            title.innerText = 'GeoFS Music Player';
-            subtitle.innerText = 'Made by 開飛機のzm';
-            musicButton.innerText = '🎵';
-            playPauseButton.innerText = audioPlayer.paused ? '▶' : '⏸';
-            modeButton.innerText = playMode === 'Loop' ? '🔂' : '🔀';
-            prevButton.innerText = '⏮';
-            nextButton.innerText = '⏭';
-            importPlaylistButton.innerText = 'Import Files';
-            settingsButton.innerText = 'Settings';
-            themeButton.innerText = `Toggle Theme (Current: ${isDarkTheme ? 'Dark' : 'Light'})`;
-            shortcutButton.innerText = `Change Shortcut (Current: ${shortcutKey})`;
-            showButtonToggle.innerText = `Show Button (Current: ${showButton ? 'Yes' : 'No'})`;
-            showBottomBarToggle.innerText = `Show Bottom Bar (Current: ${showBottomBar ? 'Yes' : 'No'})`;
-            languageButton.innerText = `Language (Current: English)`;
-            exportButton.innerText = 'Export Playlist';
-            importPlaylistButton.innerText = 'Import Playlist';
-            closeButton.innerText = 'Close';
-        }
     }
 
     // 更新快捷键
@@ -622,11 +602,11 @@
         contextMenu.style.zIndex = '1001';
 
         const renameOption = document.createElement('div');
-        renameOption.innerText = language === 'zh' ? '重命名' : 'Rename';
+        renameOption.innerText = '重命名';
         renameOption.style.cursor = 'pointer';
         renameOption.style.padding = '4px';
         renameOption.onclick = () => {
-            const newName = prompt(language === 'zh' ? '输入新名称:' : 'Enter new name:', playlist[index].name);
+            const newName = prompt('输入新名称:', playlist[index].name);
             if (newName) {
                 playlist[index].name = newName;
                 updatePlaylist();
@@ -636,7 +616,7 @@
         };
 
         const deleteOption = document.createElement('div');
-        deleteOption.innerText = language === 'zh' ? '删除' : 'Delete';
+        deleteOption.innerText = '删除';
         deleteOption.style.cursor = 'pointer';
         deleteOption.style.padding = '4px';
         deleteOption.onclick = () => {
@@ -662,16 +642,6 @@
         savePlaylistToLocal();
     }
 
-    // 文件大小限制
-    function checkFileSize(file) {
-        const maxSize = 20 * 1024 * 1024; // 20MB
-        if (file.size > maxSize) {
-            alert(language === 'zh' ? '文件大小超过20MB。请选择较小的文件。' : 'File size exceeds 20MB. Please choose a smaller file.');
-            return false;
-        }
-        return true;
-    }
-
     // 添加到页面
     document.body.appendChild(musicButton);
     document.body.appendChild(playerContainer);
@@ -681,5 +651,4 @@
     updatePlaylist();
     updateShortcut();
     updateTheme();
-    updateLanguage();
 })();
