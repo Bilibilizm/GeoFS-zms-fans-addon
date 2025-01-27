@@ -232,7 +232,7 @@
 
     // 主界面标题
     const mainTitle = document.createElement('h2');
-    mainTitle.innerText = 'zm 粉丝专属插件';
+    mainTitle.innerText = 'GeoFS-zm 粉丝专属插件';
     mainTitle.style.marginTop = '0';
     mainTitle.style.color = '#00a1d6';
     mainTitle.style.fontSize = '20px';
