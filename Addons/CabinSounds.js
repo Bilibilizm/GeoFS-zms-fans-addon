@@ -395,7 +395,7 @@
     generateButtons();
 
 document.addEventListener('keydown', function(event) {
-    if (event.key === 'd') {
+    if (event.key === 'y') {
         toggleMenu();
     }
 });
