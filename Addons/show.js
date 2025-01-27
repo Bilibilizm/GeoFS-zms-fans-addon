@@ -45,7 +45,7 @@
         menu.style.fontSize = "14px";
         menu.innerHTML = `
             <h3 style="margin: 0; font-size: 16px; text-align: center;">GeoFS飞行状态显示器</h3>
-            <p style="margin: 0; font-size: 12px; text-align: center; color: #ccc;">作者：蜂蜜水的冬日航线123</p>
+            <p style="margin: 0; font-size: 12px; text-align: center; color: #ccc;">作者：bilibili-蜂蜜水的冬日航线123</p>
             <hr style="margin: 5px 0;">
             <div>
                 <p id="flightStatus">当前状态: <span style="color: yellow;">${statusList[currentStatusIndex]}</span></p>
