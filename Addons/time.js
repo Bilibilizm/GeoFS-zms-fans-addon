@@ -22,7 +22,7 @@
         const menu = document.createElement("div");
         menu.id = "planeTimerMenu"; // 设置 ID，以便控制显示和隐藏
         menu.style.position = "absolute";
-        menu.style.bottom = "10px";
+        menu.style.top = "10px"; // 使用 top 而不是 bottom
         menu.style.left = "10px";
         menu.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
         menu.style.color = "white";
@@ -34,7 +34,7 @@
         menu.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.5)";
         menu.style.fontSize = "14px";
         menu.innerHTML = `
-            <h3 style="margin: 0; font-size: 16px; text-align: center;">飞行时间计时器</h3>
+            <h3 style="margin: 0; font-size: 16px; text-align: center;">【Q】GeoFS飞行时间计时器</h3>
             <p style="text-align: center; font-size: 12px; color: #ccc;">作者：bilibili-蜂蜜水的冬日航线123</p>
             <hr style="margin: 5px 0;">
             <div>
@@ -85,20 +85,17 @@
 
         document.body.appendChild(menu);
 
-        // 设置开始按钮功能
+        // 设置按钮功能
         document.getElementById("startTimerButton").addEventListener("click", startTimer);
-
-        // 设置暂停按钮功能
         document.getElementById("pauseTimerButton").addEventListener("click", pauseTimer);
-
-        // 设置重置按钮功能
         document.getElementById("resetTimerButton").addEventListener("click", resetTimer);
-
-        // 设置简化按钮功能
         document.getElementById("simplifyButton").addEventListener("click", toggleSimplify);
 
         // 实时更新电脑当前时间
         setInterval(updateCurrentTime, 1000);
+
+        // 添加拖动功能
+        addDraggable(menu);
     }
 
     // 开始计时器功能
@@ -155,22 +152,23 @@
         if (menu && elapsedTimeElement) {
             if (!isSimplified) {
                 // 进入简化模式
-                menu.style.bottom = "50px"; // 向下移动一点
-                menu.style.left = "10px";
+                menu.style.position = "absolute";
                 menu.style.width = "auto";
                 menu.style.padding = "5px";
-                menu.innerHTML = `<span id="elapsedTime" style="cursor: pointer;">${elapsedTimeElement.textContent}</span>`;
+                menu.innerHTML = `<span id="elapsedTime" style="cursor: pointer; display: inline-block;">${elapsedTimeElement.textContent}</span>`;
                 // 动态添加点击事件
-                document.getElementById("elapsedTime").addEventListener("click", toggleSimplify);
+                const simplifiedElement = document.getElementById("elapsedTime");
+                simplifiedElement.addEventListener("click", toggleSimplify);
+                // 添加拖动功能
+                addDraggable(simplifiedElement);
                 isSimplified = true;
             } else {
                 // 退出简化模式
-                menu.style.bottom = "10px";
-                menu.style.left = "10px";
+                menu.style.position = "absolute";
                 menu.style.width = "250px";
                 menu.style.padding = "10px";
                 menu.innerHTML = `
-                    <h3 style="margin: 0; font-size: 16px; text-align: center;">飞行时间计时器（Q）</h3>
+                    <h3 style="margin: 0; font-size: 16px; text-align: center;">飞行时间计时器</h3>
                     <p style="text-align: center; font-size: 12px; color: #ccc;">作者：蜂蜜水的冬日航线123</p>
                     <hr style="margin: 5px 0;">
                     <div>
@@ -223,9 +221,41 @@
                 document.getElementById("pauseTimerButton").addEventListener("click", pauseTimer);
                 document.getElementById("resetTimerButton").addEventListener("click", resetTimer);
                 document.getElementById("simplifyButton").addEventListener("click", toggleSimplify);
+                // 添加拖动功能
+                addDraggable(menu);
                 isSimplified = false;
             }
         }
+    }
+
+    // 添加拖动功能
+    function addDraggable(element) {
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        element.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            offsetX = e.clientX - element.getBoundingClientRect().left;
+            offsetY = e.clientY - element.getBoundingClientRect().top;
+            // 防止拖动时选中文本
+            e.preventDefault();
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                // 计算新的位置
+                const newLeft = e.clientX - offsetX;
+                const newTop = e.clientY - offsetY;
+
+                // 更新菜单的位置
+                element.style.left = `${newLeft}px`;
+                element.style.top = `${newTop}px`;
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
     }
 
     // 设置快捷键切换飞行时间计时器菜单显示/隐藏
