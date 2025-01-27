@@ -164,6 +164,91 @@
     return adModal;
   }
 
+  // 创建协作者模态框
+  function createCollaboratorModal(data) {
+    const collaboratorModal = document.createElement('div');
+    collaboratorModal.style.position = 'fixed';
+    collaboratorModal.style.top = '50%';
+    collaboratorModal.style.left = '50%';
+    collaboratorModal.style.transform = 'translate(-50%, -50%)';
+    collaboratorModal.style.backgroundColor = '#ffffff';
+    collaboratorModal.style.color = '#333333';
+    collaboratorModal.style.padding = '20px';
+    collaboratorModal.style.borderRadius = '15px';
+    collaboratorModal.style.zIndex = '10001'; // 确保广告在最上层
+    collaboratorModal.style.fontFamily = 'Arial, sans-serif';
+    collaboratorModal.style.width = '400px';
+    collaboratorModal.style.boxShadow = '0 4px 20px rgba(0, 0, 0, 0.2)';
+    collaboratorModal.style.display = 'none';
+    collaboratorModal.style.opacity = '0';
+    collaboratorModal.style.transition = 'opacity 0.3s ease';
+
+    // 协作者标题
+    const collaboratorTitle = document.createElement('h2');
+    collaboratorTitle.innerText = '协作者';
+    collaboratorTitle.style.marginTop = '0';
+    collaboratorTitle.style.color = '#00a1d6';
+    collaboratorTitle.style.fontSize = '20px';
+
+    // 协作者列表
+    const collaboratorList = document.createElement('div');
+    collaboratorList.style.maxHeight = '400px'; // 设置最大高度
+    collaboratorList.style.overflowY = 'auto'; // 添加滚动条
+
+    data.collaborators.forEach(collaborator => {
+      const collaboratorItem = document.createElement('div');
+      collaboratorItem.style.display = 'flex';
+      collaboratorItem.style.alignItems = 'center';
+      collaboratorItem.style.marginBottom = '10px';
+      collaboratorItem.style.padding = '10px';
+      collaboratorItem.style.backgroundColor = '#f5f5f5';
+      collaboratorItem.style.borderRadius = '5px';
+
+      // 协作者头像
+      const collaboratorAvatar = document.createElement('img');
+      collaboratorAvatar.src = collaborator.avatar;
+      collaboratorAvatar.alt = collaborator.name;
+      collaboratorAvatar.style.width = '40px';
+      collaboratorAvatar.style.height = '40px';
+      collaboratorAvatar.style.borderRadius = '50%';
+      collaboratorAvatar.style.marginRight = '10px';
+
+      // 协作者名称
+      const collaboratorName = document.createElement('span');
+      collaboratorName.innerText = collaborator.name;
+      collaboratorName.style.fontWeight = 'bold';
+
+      collaboratorItem.appendChild(collaboratorAvatar);
+      collaboratorItem.appendChild(collaboratorName);
+      collaboratorList.appendChild(collaboratorItem);
+    });
+
+    // 关闭按钮
+    const closeButton = document.createElement('button');
+    closeButton.innerText = '×';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.backgroundColor = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.color = '#333333';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.fontSize = '24px';
+    closeButton.addEventListener('click', () => {
+      collaboratorModal.style.opacity = '0';
+      setTimeout(() => {
+        collaboratorModal.style.display = 'none';
+      }, 300);
+    });
+
+    collaboratorModal.appendChild(collaboratorTitle);
+    collaboratorModal.appendChild(collaboratorList);
+    collaboratorModal.appendChild(closeButton);
+    document.body.appendChild(collaboratorModal);
+
+    return collaboratorModal;
+  }
+
   // 创建主插件界面
   async function createPluginUI(data) {
     if (!data) {
@@ -310,6 +395,23 @@
     interaction.innerText = '其他';
     interaction.style.fontSize = '16px';
 
+    const collaboratorButton = document.createElement('button');
+    collaboratorButton.innerText = '协作者';
+    collaboratorButton.style.marginRight = '10px';
+    collaboratorButton.style.backgroundColor = '#00a1d6';
+    collaboratorButton.style.border = 'none';
+    collaboratorButton.style.color = '#ffffff';
+    collaboratorButton.style.padding = '10px 20px';
+    collaboratorButton.style.borderRadius = '5px';
+    collaboratorButton.style.cursor = 'pointer';
+    collaboratorButton.style.transition = 'background-color 0.3s ease';
+    collaboratorButton.addEventListener('mouseenter', () => {
+      collaboratorButton.style.backgroundColor = '#008cba';
+    });
+    collaboratorButton.addEventListener('mouseleave', () => {
+      collaboratorButton.style.backgroundColor = '#00a1d6';
+    });
+
     const memberButton = document.createElement('button');
     memberButton.innerText = '会员';
     memberButton.style.marginRight = '10px';
@@ -413,7 +515,16 @@
 
     const eventModal = createModal('活动', `<p>${data.event}</p>`);
 
+    const collaboratorModal = createCollaboratorModal(data);
+
     // 按钮点击事件
+    collaboratorButton.addEventListener('click', () => {
+      collaboratorModal.style.display = 'block';
+      setTimeout(() => {
+        collaboratorModal.style.opacity = '1';
+      }, 10);
+    });
+
     memberButton.addEventListener('click', () => {
       memberModal.style.display = 'block';
       setTimeout(() => {
@@ -445,6 +556,7 @@
     pluginContainer.appendChild(pluginButtonsTitle);
     pluginContainer.appendChild(pluginButtonsContainer);
     pluginContainer.appendChild(interaction);
+    pluginContainer.appendChild(collaboratorButton);
     pluginContainer.appendChild(memberButton);
     pluginContainer.appendChild(leaderboardButton);
     pluginContainer.appendChild(eventButton);
@@ -488,6 +600,7 @@
   // 调试信息
   console.log('GeoFS 粉丝专属插件已加载！');
 })();
+
 
     // Addons
 
