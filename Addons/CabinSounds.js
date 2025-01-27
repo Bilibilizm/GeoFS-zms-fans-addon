@@ -395,11 +395,10 @@
     generateButtons();
 
     document.addEventListener('keydown', function(event) {
-        if (event.altKey && event.key === 'y') {
-            toggleMenu();
-        }
+    if (event.key === 'D') {
+        toggleMenu();
+    }
     });
-})();
 
 
 
