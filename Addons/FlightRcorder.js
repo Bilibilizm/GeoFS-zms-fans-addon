@@ -469,7 +469,7 @@
 
         // 创建解锁按钮
         const unlockButton = document.createElement('button');
-        unlockButton.textContent = '解锁快捷键';
+        unlockButton.textContent = '🔒已锁定快捷键，点此处解锁';
         unlockButton.style.position = 'fixed';
         unlockButton.style.top = '20px';
         unlockButton.style.left = '20px';
