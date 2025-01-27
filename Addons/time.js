@@ -35,7 +35,7 @@
         menu.style.fontSize = "14px";
         menu.innerHTML = `
             <h3 style="margin: 0; font-size: 16px; text-align: center;">飞行时间计时器</h3>
-            <p style="text-align: center; font-size: 12px; color: #ccc;">作者：蜂蜜水的冬日航线123</p>
+            <p style="text-align: center; font-size: 12px; color: #ccc;">作者：bilibili-蜂蜜水的冬日航线123</p>
             <hr style="margin: 5px 0;">
             <div>
                 <p>计时器: <span id="elapsedTime">00:00:00</span></p>
@@ -170,7 +170,7 @@
                 menu.style.width = "250px";
                 menu.style.padding = "10px";
                 menu.innerHTML = `
-                    <h3 style="margin: 0; font-size: 16px; text-align: center;">飞行时间计时器</h3>
+                    <h3 style="margin: 0; font-size: 16px; text-align: center;">飞行时间计时器（Q）</h3>
                     <p style="text-align: center; font-size: 12px; color: #ccc;">作者：蜂蜜水的冬日航线123</p>
                     <hr style="margin: 5px 0;">
                     <div>
