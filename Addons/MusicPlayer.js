@@ -3,7 +3,7 @@
 
     // 初始化变量
     let isDarkTheme = true;
-    let shortcutKey = 'A';
+    let shortcutKey = 'U';
     let volume = 0.5; 
     let showButton = true; 
     let showBottomBar = true; 
