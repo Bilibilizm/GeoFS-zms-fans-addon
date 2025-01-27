@@ -14,7 +14,7 @@
     const itemsPerPage = 8; 
 
     // 定义文件大小限制为150MB
-    const MAX_FILE_SIZE = 150 * 1024 * 1024; // 150MB
+    const MAX_FILE_SIZE = 150 * 1024 * 1024;
 
     // 文件大小限制检查函数
     function checkFileSize(file) {
@@ -44,7 +44,7 @@
 
     // 创建标题和副标题
     const title = document.createElement('div');
-    title.innerText = 'GeoFS音乐播放器（zm粉丝专属版）';
+    title.innerText = '【默认U】GeoFS音乐播放器（zm粉丝专属版）';
     title.style.fontSize = '20px';
     title.style.fontWeight = 'bold';
     title.style.marginBottom = '5px';
