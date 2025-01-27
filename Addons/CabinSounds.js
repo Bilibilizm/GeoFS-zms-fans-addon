@@ -394,12 +394,12 @@
 
     generateButtons();
 
-    document.addEventListener('keydown', function(event) {
-    if (event.key === 'D') {
+document.addEventListener('keydown', function(event) {
+    if (event.key === 'd') {
         toggleMenu();
     }
-    });
-
+});
+})();
 
 
 
