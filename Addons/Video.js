@@ -9,7 +9,7 @@
     // 语言文本
     const languageText = {
         'zh-CN': {
-            title: 'GeoFS视频播放器',
+            title: '【J】GeoFS视频播放器',
             subtitle: '作者：開飛機のzm',
             upload: '上传视频',
             namePlaceholder: '输入视频名称',
