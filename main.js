@@ -615,8 +615,8 @@
     const LiverySelectorUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/LiverySelector.js';
     const MusicPlayerUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/MusicPlayer.js';
     const showUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/show.js';
-    const timeUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/time.js';
-    const airmapUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/airmap';
+    const else1pUrl = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/else1';
+    const else2Url = 'https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/refs/heads/main/Addons/else2';
     // 动态加载并运行JS代码
     function loadAndRunScript(url) {
         fetch(url)
@@ -645,7 +645,7 @@
     loadAndRunScript(LiverySelectorUrl);
     loadAndRunScript(MusicPlayerUrl);
     loadAndRunScript(showUrl);
-    loadAndRunScript(timeUrl);
-   loadAndRunScript(airmapUrl);
+    loadAndRunScript(else1Url);
+    loadAndRunScript(esle2Url);
     console.log('GeoFS 插件加载器已启动');
 })();
