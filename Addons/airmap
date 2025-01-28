@@ -6,7 +6,7 @@
     overlay.style.position = 'fixed';
     overlay.style.top = '0';
     overlay.style.right = '0';
-    overlay.style.width = '350px';
+    overlay.style.width = '300px'; // 缩小界面宽度
     overlay.style.height = '100%';
     overlay.style.backgroundColor = '#f5f5f5';
     overlay.style.zIndex = '1001';
@@ -16,6 +16,25 @@
     overlay.style.fontFamily = 'Arial, sans-serif';
     overlay.style.overflow = 'hidden';
     document.body.appendChild(overlay);
+
+    // 创建标题和副标题
+    const title = document.createElement('div');
+    title.style.padding = '15px';
+    title.style.textAlign = 'center';
+    title.style.backgroundColor = '#007BFF';
+    title.style.color = '#FFF';
+    title.style.fontSize = '18px';
+    title.style.fontWeight = 'bold';
+    title.textContent = 'GeoFS航图查看器';
+    overlay.appendChild(title);
+
+    const subtitle = document.createElement('div');
+    subtitle.style.textAlign = 'center';
+    subtitle.style.color = '#666';
+    subtitle.style.fontSize = '12px';
+    subtitle.style.marginBottom = '10px';
+    subtitle.textContent = '作者：開飛機のzm';
+    overlay.appendChild(subtitle);
 
     // 创建关闭按钮
     const closeButton = document.createElement('button');
@@ -35,7 +54,7 @@
 
     // 创建文件夹列表容器
     const folderList = document.createElement('div');
-    folderList.style.padding = '20px';
+    folderList.style.padding = '0 20px';
     folderList.style.overflowY = 'auto';
     folderList.style.flex = '1';
     overlay.appendChild(folderList);
@@ -172,6 +191,7 @@
         const folderContent = document.createElement('div');
         folderContent.style.display = 'none';
         folderContent.style.padding = '10px';
+        folderContent.className = 'folder-content';
         folder.appendChild(folderContent);
 
         folderHeader.addEventListener('click', () => {
@@ -218,7 +238,7 @@
                         showPdfViewer(e.target.result);
                     });
 
-                    folder.querySelector('div:last-child').appendChild(chartItem);
+                    folder.querySelector('.folder-content').appendChild(chartItem);
                 };
                 reader.readAsDataURL(file);
             }
@@ -266,29 +286,14 @@
         document.body.appendChild(pdfViewer);
     }
 
-    // 创建“航图”按钮
-    const button = document.createElement('button');
-    button.textContent = '航图';
-    button.style.position = 'fixed';
-    button.style.bottom = '20px';
-    button.style.right = '20px';
-    button.style.zIndex = '1000';
-    button.style.padding = '10px 20px';
-    button.style.backgroundColor = '#007BFF';
-    button.style.color = '#FFF';
-    button.style.border = 'none';
-    button.style.borderRadius = '5px';
-    button.style.cursor = 'pointer';
-    button.style.fontSize = '14px';
-    button.style.transition = 'background-color 0.3s';
-    button.addEventListener('mouseenter', () => {
-        button.style.backgroundColor = '#0056b3';
+    // 添加快捷键功能
+    document.addEventListener('keydown', (e) => {
+        if (e.key === '/') {
+            if (overlay.style.display === 'none') {
+                overlay.style.display = 'flex';
+            } else {
+                overlay.style.display = 'none';
+            }
+        }
     });
-    button.addEventListener('mouseleave', () => {
-        button.style.backgroundColor = '#007BFF';
-    });
-    button.addEventListener('click', () => {
-        overlay.style.display = 'flex';
-    });
-    document.body.appendChild(button);
 })();
