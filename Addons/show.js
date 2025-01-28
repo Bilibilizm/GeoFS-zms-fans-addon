@@ -21,6 +21,11 @@
     let timerInterval = null; // 计时器 interval
     let elapsedTime = 0; // 已计时间，单位秒
 
+    // V1 速度相关
+    let v1Speed = null; // 用户输入的 V1 速度
+    let v1Triggered = false; // V1 是否已触发
+    const v1Audio = new Audio('https://raw.githubusercontent.com/Bilibilizm/GeoFS-zms-fans-addon/main/material/V1.WAV'); // V1 音频文件
+
     // 创建菜单
     const createMenu = () => {
         const menu = document.createElement('div');
@@ -35,7 +40,7 @@
         menu.style.borderRadius = '8px';
         menu.style.zIndex = '1000';
         menu.innerHTML = `
-            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: white;">【Q】GeoFS飞行辅助插件（by bilibili-蜂蜜水的冬日航线123）</h2>
+            <h2 style="margin: 0 0 10px 0; font-size: 18px; color: white;">【Q】GeoFS飞行辅助插件（by Honey）</h2>
             <h3 id="flight-state" style="margin: 0; font-size: 16px; color: yellow;">飞行状态: ${flightStates[currentStateIndex]}</h3>
             <p id="airspeed" style="color: white;">空速: 加载中...</p>
             <p id="altitude" style="color: white;">高度: 加载中...</p>
@@ -47,6 +52,10 @@
             <button id="pause-timer" style="margin-top: 10px; padding: 5px 10px; font-size: 14px; cursor: pointer; background-color: #f44336; color: white; border: none; border-radius: 5px;">暂停</button>
             <button id="reset-timer" style="margin-top: 10px; padding: 5px 10px; font-size: 14px; cursor: pointer; background-color: #2196F3; color: white; border: none; border-radius: 5px;">重置</button>
             <hr style="border: none; border-top: 1px solid #555; margin: 10px 0;">
+            <h3 style="margin: 0; font-size: 16px; color: white;">V1 速度设置</h3>
+            <input type="number" id="v1-speed-input" placeholder="输入V1速度（海里/小时）" style="margin-top: 10px; padding: 5px; font-size: 14px; width: 100px;">
+            <button id="set-v1-speed" style="margin-top: 10px; padding: 5px 10px; font-size: 14px; cursor: pointer; background-color: #2196F3; color: white; border: none; border-radius: 5px;">确定</button>
+            <hr style="border: none; border-top: 1px solid #555; margin: 10px 0;">
             <p style="color: red; font-size: 12px; margin: 0;">📌Alt+L 切换飞行状态，Q 键隐藏/显示菜单。</p>
         `;
         document.body.appendChild(menu);
@@ -55,6 +64,7 @@
         document.getElementById('start-timer').addEventListener('click', startTimer);
         document.getElementById('pause-timer').addEventListener('click', pauseTimer);
         document.getElementById('reset-timer').addEventListener('click', resetTimer);
+        document.getElementById('set-v1-speed').addEventListener('click', setV1Speed); // 设置 V1 速度按钮
     };
 
     // 更新菜单信息
@@ -72,6 +82,12 @@
             // 更新显示
             document.getElementById('airspeed').innerText = `空速: ${airspeedKts} kts`;
             document.getElementById('altitude').innerText = `高度: ${altitudeMeters.toFixed(2)} 米 / ${altitudeFeet} 英尺`;
+
+            // 检测 V1 速度
+            if (v1Speed !== null && !v1Triggered && parseFloat(airspeedKts) >= (v1Speed - 3)) { // 提前3节触发
+                v1Audio.play(); // 播放 V1 音频
+                v1Triggered = true; // 标记为已触发
+            }
         } catch (e) {
             console.error('GeoFS 飞行状态菜单插件错误:', e);
         }
@@ -102,6 +118,21 @@
         const stateElement = document.getElementById('flight-state');
         stateElement.innerText = `飞行状态: ${flightStates[currentStateIndex]}`;
         stateElement.style.color = "yellow"; // 设置状态标题为黄色
+        v1Speed = null; // 重置 V1 速度
+        v1Triggered = false; // 重置 V1 触发状态
+    };
+
+    // 设置 V1 速度
+    const setV1Speed = () => {
+        const input = document.getElementById('v1-speed-input');
+        const value = parseFloat(input.value);
+        if (!isNaN(value) && value > 0) {
+            v1Speed = value;
+            v1Triggered = false; // 重置触发状态
+            alert(`V1 速度已设置为 ${v1Speed} 海里/小时`);
+        } else {
+            alert('请输入有效的速度值（大于0的数字）');
+        }
     };
 
     // 开始计时器
