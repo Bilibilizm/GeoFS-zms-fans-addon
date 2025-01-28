@@ -454,6 +454,7 @@
 
 
 
+
 (function () {
     'use strict';
 
@@ -509,9 +510,9 @@
         e.stopPropagation();
     }
 
-    // 监听 Z 键点击事件
+    // 监听 Alt 键点击事件
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'z' || e.key === 'Z') {
+        if (e.altKey) {
             if (!isLocked) {
                 lockShortcuts();
             }
