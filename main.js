@@ -1,3 +1,12 @@
+// ==UserScript==
+// @name         GeoFS集合插件
+// @version      1.1
+// @description  zm粉丝专属
+// @author       帅比zm
+// @match        https://geo-fs.com/geofs.php*
+// @match        https://*.geo-fs.com/geofs.php*
+// @grant        none
+// ==/UserScript==
 (function () {
   'use strict';
 
