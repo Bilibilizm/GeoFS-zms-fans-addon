@@ -1,5 +1,5 @@
 const githubRepo = 'https://raw.githubusercontent.com/kolos26/GEOFS-LiverySelector/main';
-const version = '3.2.0';
+const version = '3.2.1';
 
 const liveryobj = {};
 const mpLiveryIds = {};
@@ -13,15 +13,16 @@ let airlineobjs = [];
 let whitelist;
 
 (function init() {
-    // 样式
-    fetch(`${githubRepo}/styles.css?` + Date.now()).then(async data => {
-        const styleTag = createTag('style', { type: 'text/css' });
+
+    // styles
+    fetch(`${githubRepo}/styles.css?`+Date.now()).then(async data => {
+        const styleTag = createTag('style',{type:'text/css'});
         styleTag.innerHTML = await data.text();
         document.head.appendChild(styleTag);
     });
-    appendNewChild(document.head, 'link', { rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css' });
+    appendNewChild(document.head, 'link', {rel: 'stylesheet', href: 'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css'});
 
-    // 列表面板
+    // Panel for list
     const listDiv = appendNewChild(document.querySelector('.geofs-ui-left'), 'div', {
         id: 'listDiv',
         class: 'geofs-list geofs-toggle-panel livery-list',
@@ -31,32 +32,42 @@ let whitelist;
     });
     listDiv.innerHTML = generateListHTML();
 
-    // 面板按钮
+    // Button for panel
     const geofsUiButton = document.querySelector('.geofs-ui-bottom');
     const insertPos = geofs.version >= 3.6 ? 4 : 3;
     geofsUiButton.insertBefore(generatePanelButtonHTML(), geofsUiButton.children[insertPos]);
 
-    // 删除原始按钮
+    //remove original buttons
     const origButtons = document.getElementsByClassName('geofs-liveries geofs-list-collapsible-item');
     Object.values(origButtons).forEach(btn => btn.parentElement.removeChild(btn));
 
-    // 加载涂装（@todo: 考虑移动到listLiveries）
-    fetch(`${githubRepo}/livery.json?` + Date.now()).then(handleLiveryJson);
+    //Load liveries (@todo: consider moving to listLiveries)
+    fetch(`${githubRepo}/livery.json?`+Date.now()).then(handleLiveryJson);
 
-    // 初始化航空公司数据库
+    //Init airline databases
     if (localStorage.getItem('links') === null) {
         localStorage.links = '';
     } else {
-        links = localStorage.links.split(",");
-        links.forEach(async function (e) {
-            await fetch(e).then(res => res.json()).then(data => airlineobjs.push(data));
-            airlineobjs[airlineobjs.length - 1].url = e.trim();
-        });
+            links = localStorage.links.split(",");
+            links.forEach(async function(e){
+                await fetch(e).then(res => res.json()).then(data => airlineobjs.push(data));
+                airlineobjs[airlineobjs.length-1].url = e.trim();
+            });
     }
-    fetch(`${githubRepo}/whitelist.json?` + Date.now()).then(res => res.json()).then(data => whitelist = data);
+    fetch(`${githubRepo}/whitelist.json?`+Date.now()).then(res => res.json()).then(data => whitelist = data);
 
-    // 开始多人游戏
+    // Start multiplayer
     setInterval(updateMultiplayer, 5000);
+
+    window.addEventListener("keyup", function(e){
+        if (e.target.classList.contains("geofs-stopKeyupPropagation")) {
+            e.stopImmediatePropagation();
+        }
+        if (e.key === "l"){
+            listLiveries();
+            ui.panel.toggle(".livery-list");
+        }
+    });
 })();
 
 /**
@@ -69,40 +80,40 @@ async function handleLiveryJson(data) {
     if (liveryobj.version != version) {
         document.querySelector('.livery-list h3').appendChild(
             createTag('a', {
-                href: 'https://github.com/kolos26/GEOFS-LiverySelector',
-                target: '_blank',
+                href:'https://github.com/kolos26/GEOFS-LiverySelector',
+                target:'_blank',
                 style: 'display:block;width:100%;text-decoration:none;text-align:center;'
-            }, '有可用更新：' + liveryobj.version)
+            }, 'Update available: ' + liveryobj.version)
         );
     }
-    // 为有涂装的飞机标记图标
+    // mark aircraft with livery icons
     Object.keys(liveryobj.aircrafts).forEach(aircraftId => {
         if (liveryobj.aircrafts[aircraftId].liveries.length < 2) {
-            return; // 只有当涂装数量超过一个时才显示图标
+            return; // only show icon if there's more than one livery
         }
         const element = document.querySelector(`[data-aircraft='${aircraftId}']`);
-        // 保存原始HTML以便后续使用（重新加载、更换飞机等）
+        // save original HTML for later use (reload, aircraft change, etc..)
         if (!origHTMLs[aircraftId]) {
             origHTMLs[aircraftId] = element.innerHTML;
         }
 
-        // 使用原始HTML进行拼接，确保只显示一个图标
+        // use orig HTML to concatenate so theres only ever one icon
         element.innerHTML = origHTMLs[aircraftId] +
             createTag('img', {
                 src: `${githubRepo}/liveryselector-logo-small.svg`,
-                style: 'height:30px;width:auto;margin-left:20px;',
-                title: '有可用的涂装'
+                style:'height:30px;width:auto;margin-left:20px;',
+                title:'Liveries available'
             }).outerHTML;
 
         if (liveryobj.aircrafts[aircraftId].mp != "disabled")
-            element.innerHTML += createTag('small', {
-                title: '涂装在多人游戏中兼容\n（其他玩家可见）'
-            }, '支持其他玩家看到你的涂装').outerHTML;
+            element.innerHTML += createTag('small',{
+                title:'Liveries are multiplayer compatible\n(visible to other players)'
+            }, '🎮').outerHTML;
     });
 }
 
 /**
- * 触发GeoFS API加载纹理
+ * Triggers GeoFS API to load texture
  *
  * @param {string[]} texture
  * @param {number[]} index
@@ -110,10 +121,10 @@ async function handleLiveryJson(data) {
  * @param {Object[]} mats
  */
 function loadLivery(texture, index, parts, mats) {
-    // 更改涂装
+    //change livery
     for (let i = 0; i < texture.length; i++) {
         const model3d = geofs.aircraft.instance.definition.parts[parts[i]]['3dmodel'];
-        // 检查材质定义（对于未贴图的部分）
+        // check for material definition (for untextured parts)
         if (typeof texture[i] === 'object') {
             if (texture[i].material !== undefined) {
                 const mat = mats[texture[i].material];
@@ -127,19 +138,19 @@ function loadLivery(texture, index, parts, mats) {
         } else if (geofs.version >= 3.0 && geofs.version <= 3.7) {
             geofs.api.changeModelTexture(model3d._model, texture[i], index[i]);
         } else {
-            geofs.api.changeModelTexture(model3d._model, texture[i], { index: index[i] });
+            geofs.api.changeModelTexture(model3d._model, texture[i], {index:index[i]});
         }
     }
 }
 
 /**
- * 从文本输入字段加载涂装
+ * Load liveries from text input fields
  */
 function inputLivery() {
     const airplane = getCurrentAircraft();
     const textures = airplane.liveries[0].texture;
     const inputFields = document.getElementsByName('textureInput');
-    if (textures.filter(x => x === textures[0]).length === textures.length) { // 所有索引和部分使用相同的纹理
+    if (textures.filter(x => x === textures[0]).length === textures.length) { // the same texture is used for all indexes and parts
         const texture = inputFields[0].value;
         loadLivery(Array(textures.length).fill(texture), airplane.index, airplane.parts);
     } else {
@@ -150,57 +161,57 @@ function inputLivery() {
 }
 
 /**
- * 提交涂装进行审核
+ * Submit livery for review
  */
 function submitLivery() {
     const airplane = getCurrentAircraft();
     const textures = airplane.liveries[0].texture;
     const inputFields = document.getElementsByName('textureInput');
     const formFields = {};
-    document.querySelectorAll('.livery-submit input').forEach(f => formFields[f.id.replace('livery-submit-', '')] = f);
+    document.querySelectorAll('.livery-submit input').forEach(f => formFields[f.id.replace('livery-submit-','')] = f);
     if (!localStorage.liveryDiscordId || localStorage.liveryDiscordId.length < 6) {
-        return alert('无效的Discord用户ID！');
+        return alert('Invalid Discord User id!');
     }
     if (formFields.liveryname.value.trim().length < 3) {
-        return alert('无效的涂装名称！');
+        return alert('Invalid Livery Name!');
     }
     if (!formFields['confirm-perms'].checked || !formFields['confirm-legal'].checked) {
-        return alert('请确认所有复选框！');
+        return alert('Confirm all checkboxes!');
     }
     const json = {
         name: formFields.liveryname.value.trim(),
         credits: formFields.credits.value.trim(),
         texture: []
     };
-    if (!json.name || json.name.trim() == '') {
+    if (!json.name || json.name.trim()=='') {
         return;
     }
     const hists = [];
     const embeds = [];
-    inputFields.forEach((f, i) => {
+    inputFields.forEach((f,i) => {
         f.value = f.value.trim();
         if (f.value.match(/^https:\/\/.+/i)) {
             const hist = Object.values(uploadHistory).find(o => o.url == f.value);
             if (!hist) {
-                return alert('只有自己上传的imgbb链接才能提交！');
+                return alert('Only self-uploaded imgbb links work for submitting!');
             }
             if (hist.expiration > 0) {
-                return alert('不能提交会过期的链接！请禁用“一小时后过期链接”选项并重新上传纹理：\n' + airplane.labels[i]);
+                return alert('Can\' submit expiring links! DISABLE "Expire links after one hour" option and re-upload texture:\n' + airplane.labels[i]);
             }
             const embed = {
-                title: airplane.labels[i] + ' (' + (Math.ceil(hist.size / 1024 / 10.24) / 100) + 'MB, ' + hist.width + 'x' + hist.height + ')',
+                title: airplane.labels[i] + ' (' + (Math.ceil(hist.size/1024/10.24)/100) + 'MB, '+hist.width +'x' + hist.height +')',
                 description: f.value,
                 image: { url: f.value },
                 fields: [
-                    { name: '时间戳', value: new Date(hist.time * 1e3), inline: true },
-                    { name: '文件ID', value: hist.id, inline: true },
+                    { name: 'Timestamp', value: new Date(hist.time*1e3), inline: true },
+                    { name: 'File ID', value: hist.id, inline: true },
                 ]
             };
             if (hist.submitted) {
-                if (!confirm('以下纹理已经提交过：\n' + f.value + '\n是否继续？')) {
+                if (!confirm('The following texture was already submitted:\n' + f.value + '\nContinue anyway?')) {
                     return;
                 }
-                embed.fields.push({ name: '首次提交', value: new Date(hist.submitted * 1e3) });
+                embed.fields.push({ name: 'First submitted', value: new Date(hist.submitted*1e3) });
             }
             embeds.push(embed);
             hists.push(hist);
@@ -210,22 +221,22 @@ function submitLivery() {
         }
     });
     if (!embeds.length)
-        return alert('没有可提交的内容，请先上传图片！');
+        return alert('Nothing to submit, upload images first!');
 
     let content = [
-        `涂装上传用户：<@${localStorage.liveryDiscordId}>`,
-        `__飞机：__ \`${geofs.aircraft.instance.id}\` ${geofs.aircraft.instance.aircraftRecord.name}`,
-        `__涂装名称：__ \`${json.name}\``,
+        `Livery upload by <@${localStorage.liveryDiscordId}>`,
+        `__Plane:__ \`${geofs.aircraft.instance.id}\` ${geofs.aircraft.instance.aircraftRecord.name}`,
+        `__Livery Name:__ \`${json.name}\``,
         '```json\n' + JSON.stringify(json, null, 2) + '```'
     ];
 
     fetch(atob(liveryobj.dapi), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: content.join('\n'), embeds })
+        body: JSON.stringify({content: content.join('\n'), embeds })
     }).then(res => {
         hists.forEach(hist => {
-            hist.submitted = hist.submitted || Math.round(new Date() / 1000);
+            hist.submitted = hist.submitted || Math.round(new Date()/1000);
         });
         localStorage.lsUploadHistory = JSON.stringify(uploadHistory);
     });
@@ -253,13 +264,13 @@ function sortList(id) {
 }
 
 /**
- * 主涂装列表
+ *  main livery list
  */
 function listLiveries() {
     domById('liverylist').innerHTML = '';
 
     const thumbsDir = [githubRepo, 'thumbs'].join('/');
-    const defaultThumb = [thumbsDir, geofs.aircraft.instance.id + '.png'].join('/');
+    const defaultThumb = [thumbsDir, geofs.aircraft.instance.id+'.png'].join('/');
     const airplane = getCurrentAircraft();
     airplane.liveries.forEach(function (e, idx) {
         if (e.disabled) return;
@@ -271,11 +282,11 @@ function listLiveries() {
         listItem.onclick = () => {
             loadLivery(e.texture, airplane.index, airplane.parts, e.materials);
             if (e.mp != 'disabled') {
-                // 使用原版ID以保持与基础游戏兼容
-                setInstanceId(idx + (e.credits?.toLowerCase() == 'geofs' ? '' : liveryIdOffset));
+                // use vanilla ids for basegame compat
+                setInstanceId(idx+(e.credits?.toLowerCase()=='geofs'?'':liveryIdOffset));
             }
         };
-        listItem.innerHTML = createTag('span', { class: 'livery-name' }, e.name).outerHTML;
+        listItem.innerHTML = createTag('span', {class:'livery-name'}, e.name).outerHTML;
         if (geofs.aircraft.instance.id < 1000) {
             listItem.classList.add('offi');
             const thumb = createTag('img');
@@ -283,13 +294,13 @@ function listLiveries() {
                 thumb.onerror = null;
                 thumb.src = defaultThumb;
             };
-            thumb.src = [thumbsDir, geofs.aircraft.instance.id, geofs.aircraft.instance.id + '-' + idx + '.png'].join('/');
+            thumb.src = [thumbsDir, geofs.aircraft.instance.id, geofs.aircraft.instance.id+'-'+idx+'.png'].join('/');
             listItem.appendChild(thumb);
         } else {
             listItem.classList.remove('offi');
         }
         if (e.credits && e.credits.length) {
-            listItem.innerHTML += `<small>作者：${e.credits}</small>`;
+            listItem.innerHTML += `<small>by ${e.credits}</small>`;
         }
 
         appendNewChild(listItem, 'span', {
@@ -319,13 +330,13 @@ function loadFavorites() {
     });
 }
 
-function loadAirlines() {
+function loadAirlines(){
     domById("airlinelist").innerHTML = '';
     const airplane = getCurrentAircraft();
     const textures = airplane.liveries[0].texture;
-    airlineobjs.forEach(function (airline) {
+    airlineobjs.forEach(function(airline){
         let airlinename = appendNewChild(domById('airlinelist'), 'li', {
-            style: "color:" + airline.color + ";background-color:" + airline.bgcolor + "; font-weight: bold;"
+            style: "color:"+airline.color+";background-color:"+airline.bgcolor+"; font-weight: bold;"
         });
         airlinename.innerText = airline.name;
         let removebtn = appendNewChild(airlinename, "button", {
@@ -333,32 +344,32 @@ function loadAirlines() {
             style: "float: right; margin-top: 6px; background-color: #9e150b;",
             onclick: `LiverySelector.removeAirline("${airline.url}")`
         });
-        removebtn.innerText = "- 删除航空公司";
-        airline.aircrafts[geofs.aircraft.instance.id].liveries.forEach(function (e) {
+        removebtn.innerText = "- Remove airline";
+        airline.aircrafts[geofs.aircraft.instance.id].liveries.forEach(function(e){
             let listItem = appendNewChild(domById('airlinelist'), 'li', {
                 id: [geofs.aircraft.instance.id, e.name, 'button'].join('_'),
                 class: 'livery-list-item'
             });
-            if (textures.filter(x => x === textures[0]).length === textures.length) { // 所有索引和部分使用相同的纹理
+            if (textures.filter(x => x === textures[0]).length === textures.length) { // the same texture is used for all indexes and parts
                 const texture = e.texture[0];
                 listItem.onclick = () => {
                     loadLivery(Array(textures.length).fill(texture), airplane.index, airplane.parts);
-                    if (airplane.mp != 'disabled' && whitelist.includes(airline.url.trim())) {
+                    if (airplane.mp != 'disabled' && whitelist.includes(airline.url.trim())){
                         setInstanceId(texture);
                     }
                 }
-            } else {
+                } else {
                 listItem.onclick = () => {
                     let textureIndex = airplane.labels.indexOf("Texture");
                     loadLivery(e.texture, airplane.index, airplane.parts);
-                    if (airplane.mp != 'disabled' && whitelist.includes(airline.url.trim())) {
+                    if (airplane.mp != 'disabled' && whitelist.includes(airline.url.trim())){
                         setInstanceId(e.texture[textureIndex]);
                     }
                 }
             }
-            listItem.innerHTML = createTag('span', { class: 'livery-name' }, e.name).outerHTML;
+            listItem.innerHTML = createTag('span', {class:'livery-name'}, e.name).outerHTML;
             if (e.credits && e.credits.length) {
-                listItem.innerHTML += `<small>作者：${e.credits}</small>`;
+                listItem.innerHTML += `<small>by ${e.credits}</small>`;
             }
         });
     });
@@ -368,21 +379,21 @@ function addCustomForm() {
     document.querySelector('#livery-custom-tab-upload .upload-fields').innerHTML = '';
     document.querySelector('#livery-custom-tab-direct .upload-fields').innerHTML = '';
     const airplane = getCurrentAircraft();
-    const textures = airplane.liveries[0].texture.filter(t => typeof t !== 'object');
+    const textures = airplane.liveries[0].texture.filter(t=>typeof t !== 'object');
     if (!textures.length) {
-        return; // 忽略材质定义
+        return; // ignore material defs
     }
     const placeholders = airplane.labels;
-    if (textures.filter(x => x === textures[0]).length === textures.length) { // 所有索引和部分使用相同的纹理
+    if (textures.filter(x => x === textures[0]).length === textures.length) { // the same texture is used for all indexes and parts
         createUploadButton(placeholders[0]);
         createDirectButton(placeholders[0]);
     } else {
-        placeholders.forEach((placeholder, i) => {
+        placeholders.forEach((placeholder,i)=>{
             createUploadButton(placeholder);
-            createDirectButton(placeholder, i);
+            createDirectButton(placeholder,i);
         });
     }
-    // 点击第一个标签以刷新按钮状态
+    // click first tab to refresh button status
     document.querySelector('.livery-custom-tabs li').click();
 }
 
@@ -399,7 +410,7 @@ function search(text) {
 }
 
 /**
- * 标记为收藏
+ * Mark as favorite
  *
  * @param {HTMLElement} element
  */
@@ -426,7 +437,7 @@ function star(element) {
         }
         localStorage.favorites = list;
     }
-    // 样式动画
+    //style animation
     e.toggle('checked');
     e.toggle('nocheck');
 }
@@ -454,11 +465,11 @@ function createUploadButton(id) {
  * @param {string} id
  * @param {number} i
  */
-function createDirectButton(id, i) {
+function createDirectButton(id,i) {
     const customDiv = document.querySelector('#livery-custom-tab-direct .upload-fields');
     appendNewChild(customDiv, 'input', {
         type: 'file',
-        onchange: 'LiverySelector.loadLiveryDirect(this,' + i + ')'
+        onchange: 'LiverySelector.loadLiveryDirect(this,'+i+')'
     });
     appendNewChild(customDiv, 'span').innerHTML = id;
     appendNewChild(customDiv, 'br');
@@ -480,12 +491,12 @@ function loadLiveryDirect(fileInput, i) {
             geofs.api.changeModelTexture(
                 geofs.aircraft.instance.definition.parts[airplane.parts[i]]["3dmodel"]._model,
                 newTexture,
-                { index: airplane.index[i] }
+                {index:airplane.index[i]}
             );
         }
         fileInput.value = null;
     });
-    // 读取文件（如果存在）
+    // read file (if there is one)
     fileInput.files.length && reader.readAsDataURL(fileInput.files[0]);
 }
 
@@ -496,14 +507,14 @@ function uploadLivery(fileInput) {
     if (!fileInput.files.length)
         return;
     if (!localStorage.imgbbAPIKEY) {
-        alert('未保存imgbb API密钥！请检查API标签');
+        alert('No imgbb API key saved! Check API tab');
         fileInput.value = null;
         return;
     }
     const form = new FormData();
     form.append('image', fileInput.files[0]);
     if (localStorage.liveryAutoremove)
-        form.append('expiration', (new Date() / 1000) * 60 * 60);
+        form.append('expiration', (new Date()/1000) * 60 * 60);
 
     const settings = {
         'url': `https://api.imgbb.com/1/upload?key=${localStorage.imgbbAPIKEY}`,
@@ -527,18 +538,18 @@ function uploadLivery(fileInput) {
     });
 }
 
-function handleCustomTabs(e) {
+function handleCustomTabs(e){
     e = e || window.event;
     const src = e.target || e.srcElement;
     const tabId = src.innerHTML.toLocaleLowerCase();
-    // 遍历所有div并检查是否是点击的那一个，隐藏其他
+    // iterate all divs and check if it was the one clicked, hide others
     domById('customDiv').querySelectorAll(':scope > div').forEach(tabDiv => {
         if (tabDiv.id != ['livery-custom-tab', tabId].join('-')) {
-            tabDiv.style.display = 'none';
+            tabDiv.style.display =  'none';
             return;
         }
         tabDiv.style.display = '';
-        // 每个标签的特殊处理，可以提取出来
+        // special handling for each tab, could be extracted
         switch (tabId) {
             case 'upload': {
                 const fields = tabDiv.querySelectorAll('input[type="file"]');
@@ -561,7 +572,7 @@ function handleCustomTabs(e) {
 }
 
 /**
- * 重新加载当前飞机的纹理文件
+ * reloads texture files for current airplane
  *
  * @param {HTMLElement} tabDiv
  */
@@ -571,16 +582,16 @@ function reloadDownloadsForm(tabDiv) {
     const defaults = liveries[0];
     const fields = tabDiv.querySelector('.download-fields');
     fields.innerHTML = '';
-    liveries.forEach((livery, liveryNo) => {
+    liveries.forEach((livery,liveryNo) => {
         const textures = livery.texture.filter(t => typeof t !== 'object');
-        if (!textures.length) return; // 忽略材质定义
+        if (!textures.length) return; // ignore material defs
         appendNewChild(fields, 'h7').innerHTML = livery.name;
         const wrap = appendNewChild(fields, 'div');
-        textures.forEach((href, i) => {
+        textures.forEach((href,i) => {
             if (typeof href === 'object') return;
             if (liveryNo > 0 && href == defaults.texture[i]) return;
-            const link = appendNewChild(wrap, 'a', { href, target: '_blank',
-                class: "mdl-button mdl-button--raised mdl-button--colored"
+            const link = appendNewChild(wrap,'a',{href,target:'_blank',
+                class:"mdl-button mdl-button--raised mdl-button--colored"
             });
             link.innerHTML = airplane.labels[i];
         });
@@ -588,28 +599,28 @@ function reloadDownloadsForm(tabDiv) {
 }
 
 /**
- * 重新加载设置表单
+ * reloads settings form after changes
  */
 function reloadSettingsForm() {
     const apiInput = domById('livery-setting-apikey');
     apiInput.placeholder = localStorage.imgbbAPIKEY ?
-        'API 密钥已保存 ✓ (输入 CLEAR 以删除)' :
-        '在此输入 API 密钥';
+        'API KEY SAVED ✓ (type CLEAR to remove)' :
+        'API KEY HERE';
 
     const removeCheckbox = domById('livery-setting-remove');
-    removeCheckbox.checked = (localStorage.liveryAutoremove == 1);
+    removeCheckbox.checked = (localStorage.liveryAutoremove==1);
 
     const discordInput = domById('livery-setting-discordid');
-    discordInput.value = localStorage.liveryDiscordId || '';
+    discordInput.value = localStorage.liveryDiscordId||'';
 }
 
 /**
- * 保存设置，从事件元素获取设置键
+ * saves setting, gets setting key from event element
  *
  * @param {HTMLElement} element
  */
 function saveSetting(element) {
-    const id = element.id.replace('livery-setting-', '');
+    const id = element.id.replace('livery-setting-','');
     switch (id) {
         case 'apikey': {
             if (element.value.length) {
@@ -633,24 +644,23 @@ function saveSetting(element) {
     reloadSettingsForm();
 }
 
-async function addAirline() {
-    let url = prompt("输入航空公司的json文件URL:");
-    if (!links.includes(url)) {
+async function addAirline(){
+    let url = prompt("Enter URL to the json file of the airline:");
+    if (!links.includes(url)){
         links.push(url);
-        localStorage.links += `,${url}`;
+        localStorage.links += `,${url}`
         await fetch(url).then(res => res.json()).then(data => airlineobjs.push(data));
-        airlineobjs[airlineobjs.length - 1].url = url.trim();
+        airlineobjs[airlineobjs.length-1].url = url.trim();
         loadAirlines();
     } else {
-        alert("航空公司已添加");
+        alert("Airline already added");
     }
 }
-
-function removeAirline(url) {
+function removeAirline(url){
     removeItem(links, url.trim());
     localStorage.links = links.toString();
-    airlineobjs.forEach(function (e, index) {
-        if (e.url.trim() === url.trim()) {
+    airlineobjs.forEach(function(e, index){
+        if (e.url.trim() === url.trim()){
             airlineobjs.splice(index, 1);
         }
     });
@@ -658,7 +668,7 @@ function removeAirline(url) {
 }
 
 /**
- * @returns {object} 当前飞机从liveryobj
+ * @returns {object} current aircraft from liveryobj
  */
 function getCurrentAircraft() {
     return liveryobj.aircrafts[geofs.aircraft.instance.id];
@@ -674,39 +684,39 @@ function updateMultiplayer() {
         let textures = [];
         let otherId = u.currentLivery;
         if (!liveryEntry || !u.model || liveryEntry.mp == 'disabled') {
-            return; // 没有涂装或已禁用
+            return; // without livery or disabled
         }
         if (mpLiveryIds[u.id] === otherId) {
-            return; // 已更新
+            return; // already updated
         }
         mpLiveryIds[u.id] = otherId;
         if (otherId >= mlIdOffset && otherId < liveryIdOffset) {
-            textures = getMLTexture(u, liveryEntry); // ML范围 1k-10k
-        } else if ((otherId >= liveryIdOffset && otherId < liveryIdOffset * 2) || typeof (otherId == "string")) {
-            textures = getMPTexture(u, liveryEntry); // LS范围 10k+10k
+            textures = getMLTexture(u, liveryEntry); // ML range 1k-10k
+        } else if ((otherId >= liveryIdOffset && otherId < liveryIdOffset*2) || typeof(otherId == "string")) {
+            textures = getMPTexture(u, liveryEntry); // LS range 10k+10k
         } else {
-            return; // 游戏管理的涂装
+            return; // game managed livery
         }
         textures.forEach(texture => {
             applyMPTexture(
                 texture.uri,
                 texture.tex,
-                img => u.model.changeTexture(img, { index: texture.index })
+                img => u.model.changeTexture(img, {index: texture.index})
             );
         });
     });
 }
 
 /**
- * 获取并调整纹理到预期格式
+ * Fetch and resize texture to expected format
  * @param {string} url
  * @param {sd} tex
  * @param {function} cb
  */
 function applyMPTexture(url, tex, cb) {
     try {
-        Cesium.Resource.fetchImage({ url }).then(img => {
-            const canvas = createTag('canvas', { width: tex._width, height: tex._height });
+        Cesium.Resource.fetchImage({url}).then(img => {
+            const canvas = createTag('canvas', {width: tex._width, height: tex._height});
             canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
             cb(canvas.toDataURL('image/png'));
         });
@@ -722,14 +732,14 @@ function applyMPTexture(url, tex, cb) {
 function getMPTexture(u, liveryEntry) {
     const otherId = u.currentLivery - liveryIdOffset;
     const textures = [];
-    // 检查模型的预期纹理
+    // check model for expected textures
     const uModelTextures = u.model._model._rendererResources.textures;
     console.log(u.currentLivery);
-    console.log(typeof (u.currentLivery));
-    if (typeof (u.currentLivery[0]) == "string") {
-        console.log("VA 检测到");
+    console.log(typeof(u.currentLivery));
+    if (typeof(u.currentLivery[0]) == "string"){
+        console.log("VA detected");
         console.log(u.currentLivery);
-        // 尝试在单条目中使用主纹理
+        // try main texture on single-entry
         textures.push({
             uri: u.currentLivery,
             tex: uModelTextures[0],
@@ -737,7 +747,7 @@ function getMPTexture(u, liveryEntry) {
         });
     } else {
         if (liveryEntry.mp == 'multi') {
-            // 尝试在多条目中映射纹理
+            // try map textures on multi-entry
             liveryEntry.index.forEach((index, pos) => {
                 textures.push({
                     uri: liveryEntry.liveries[otherId].texture[pos],
@@ -747,7 +757,7 @@ function getMPTexture(u, liveryEntry) {
             });
         } else {
             const texIdx = liveryEntry.labels.indexOf('Texture');
-            // 尝试在单条目中使用主纹理
+            // try main texture on single-entry
             textures.push({
                 uri: liveryEntry.liveries[otherId].texture[texIdx],
                 tex: uModelTextures[0],
@@ -783,25 +793,25 @@ function getMLTexture(u, liveryEntry) {
     return textures;
 }
 
-/******************* 工具函数 *********************/
+/******************* Utilities *********************/
 
 /**
- * @param {string} id Div ID 切换，除了点击的元素
+ * @param {string} id Div ID to toggle, in addition to clicked element
  */
 function toggleDiv(id) {
     const div = domById(id);
     const target = window.event.target;
     if (target.classList.contains('closed')) {
         target.classList.remove('closed');
-        div.style.display = '';
+        div.style.display='';
     } else {
         target.classList.add('closed');
-        div.style.display = 'none';
+        div.style.display='none';
     }
 }
 
 /**
- * 创建标签 <name attributes=...
+ * Create tag with <name attributes=...
  *
  * @param {string} name
  * @param {Object} attributes
@@ -810,21 +820,21 @@ function toggleDiv(id) {
  */
 function createTag(name, attributes = {}, content = '') {
     const el = document.createElement(name);
-    Object.keys(attributes || {}).forEach(k => el.setAttribute(k, attributes[k]));
-    if (('' + content).length) {
+    Object.keys(attributes||{}).forEach(k => el.setAttribute(k, attributes[k]));
+    if ((''+content).length) {
         el.innerHTML = content;
     }
     return el;
 }
 
 /**
- * 创建新元素 <tagName attributes=...
- * 添加到父级并返回子级以便后续访问
+ * Creates a new element <tagName attributes=...
+ * appends to parent and returns the child for later access
  *
  * @param {HTMLElement} parent
  * @param {string} tagName
  * @param {object} attributes
- * @param {number} pos 在第N个位置插入（默认追加）
+ * @param {number} pos insert in Nth position (default append)
  * @returns {HTMLElement}
  */
 function appendNewChild(parent, tagName, attributes = {}, pos = -1) {
@@ -853,92 +863,93 @@ function domById(elementId) {
     return document.getElementById(elementId);
 }
 
-/******************* HTML & CSS 模板 *********************/
+/******************* HTML & CSS Templates *********************/
 
 /**
- * @returns {string} 主面板的HTML模板
+ * @returns {string} HTML template for main panel
  */
 function generateListHTML() {
     return `
-        <h3><img src="${githubRepo}/liveryselector-logo.svg" class="livery-title" title="涂装选择器" /></h3>
-        <h2 class="livery-selector-title">涂装选择器（zm粉丝专属中文版）</h2>
+        <h3><img src="${githubRepo}/liveryselector-logo.svg" class="livery-title" title="LiverySelector" /></h3>
+
         <div class="livery-searchbar mdl-textfield mdl-js-textfield geofs-stopMousePropagation geofs-stopKeyupPropagation">
-            <input class="mdl-textfield__input address-input" type="text" placeholder="搜索涂装" onkeyup="LiverySelector.search(this.value)" id="searchlivery">
-            <label class="mdl-textfield__label" for="searchlivery">搜索涂装</label>
+            <input class="mdl-textfield__input address-input" type="text" placeholder="Search liveries" onkeyup="LiverySelector.search(this.value)" id="searchlivery">
+            <label class="mdl-textfield__label" for="searchlivery">Search liveries</label>
         </div>
 
-        <h6 onclick="LiverySelector.toggleDiv('favorites')">收藏的涂装</h6>
+        <h6 onclick="LiverySelector.toggleDiv('favorites')">Favorite liveries</h6>
         <ul id="favorites" class="geofs-list geofs-visible"></ul>
 
-        <h6 onclick="LiverySelector.toggleDiv('liverylist')">可用的涂装</h6>
+        <h6 onclick="LiverySelector.toggleDiv('liverylist')">Available liveries</h6>
         <ul id="liverylist" class="geofs-list geofs-visible"></ul>
 
-        <h6 onclick="LiverySelector.toggleDiv('airlinelist')">虚拟航空公司</h6><button class="mdl-button mdl-js-button mdl-button--raised mdl-button" style="background-color: #096628; color: white;" onclick="LiverySelector.addAirline()">+ 添加航空公司</button>
+        <h6 onclick="LiverySelector.toggleDiv('airlinelist')">Virtual airlines</h6><button class="mdl-button mdl-js-button mdl-button--raised mdl-button" style="background-color: #096628; color: white;" onclick="LiverySelector.addAirline()">+ Add airline</button>
         <ul id="airlinelist" class="geofs-list geofs-visible"></ul>
 
-        <h6 onclick="LiverySelector.toggleDiv('customDiv')" class="closed">加载外部涂装</h6>
+        <h6 onclick="LiverySelector.toggleDiv('customDiv')" class="closed">Load external livery</h6>
         <div id="customDiv" class="mdl-textfield mdl-js-textfield geofs-stopMousePropagation geofs-stopKeyupPropagation" style="display:none;">
             <ul class="livery-custom-tabs" onclick="LiverySelector.handleCustomTabs()">
-                <li>上传</li>
-                <li>直接加载</li>
-                <li>下载</li>
+                <li>Upload</li>
+                <li>Direct</li>
+                <li>Download</li>
                 <li>API</li>
             </ul>
             <div id="livery-custom-tab-upload" style="display:none;">
-                <div>粘贴URL或上传图片以生成imgbb URL</div>
+                <div>Paste URL or upload image to generate imgbb URL</div>
                 <div class="upload-fields"></div>
-                <div><button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="LiverySelector.inputLivery()">加载涂装</button></div>
-                <div class="livery-submit geofs-list-collapsible-item">为LiverySelector数据库贡献涂装
-                    <div class="geofs-collapsible no-api">-&gt; 在API标签中填写API密钥和Discord用户ID。</div>
+                <div><button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="LiverySelector.inputLivery()">Load livery</button></div>
+                <div class="livery-submit geofs-list-collapsible-item">Contribute to the LiverySelector Database
+                    <div class="geofs-collapsible no-api">-&gt; Fill in API key and Discord User ID in API tab.</div>
                     <div class="geofs-collapsible api">
-                        <label for="livery-submit-liveryname">涂装名称</label>
+                        <label for="livery-submit-liveryname">Livery Name</label>
                         <input type="text" id="livery-submit-liveryname" class="mdl-textfield__input address-input">
-                        <label for="livery-submit-credits">作者</label>
+                        <label for="livery-submit-credits">Author</label>
                         <input type="text" id="livery-submit-credits" class="mdl-textfield__input address-input">
                         <input type="checkbox" id="livery-submit-confirm-perms">
-                        <label for="livery-submit-confirm-perms">我是作者，我自己创建了这些纹理，或者我有作者的许可使用这些纹理。</label><br>
+                        <label for="livery-submit-confirm-perms">I am the author and have created the textures myself or have the permission from the author to use those textures.</label><br>
                         <input type="checkbox" id="livery-submit-confirm-legal">
-                        <label for="livery-submit-confirm-legal">我确认这些纹理适合所有年龄段，不包含冒犯性内容，符合游戏要求，且不违反任何法律或其他规定。</label>
-                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="LiverySelector.submitLivery()">提交涂装审核</button>
+                        <label for="livery-submit-confirm-legal">I confirm the textures are safe for all ages, are non-offensive and appropriate for the game and don't violate any laws or other regulations.</label>
+                        <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored" onclick="LiverySelector.submitLivery()">Submit livery for review</button>
                         <small>
-                          加入我们的<a href="https://discord.gg/2tcdzyYaWU" target="_blank">Discord服务器</a>以跟进您的贡献。
-                          提交即表示您同意遵守Discord服务器规则。违反规则可能导致您无法继续提交。
+                          Join our <a href="https://discord.gg/2tcdzyYaWU" target="_blank">Discord</a> to follow up on your contributions.
+                          By submitting you agree to the Discord server rules. Failing to comply may result in exclusion from further submits.
                         </small>
                     </div>
                 </div>
             </div>
             <div id="livery-custom-tab-direct" style="display:none;">
-                <div>直接在客户端加载纹理，无需上传。</div>
+                <div>Load texture directly in client, no upload.</div>
                 <div class="upload-fields"></div>
             </div>
             <div id="livery-custom-tab-download" style="display:none;">
-                <div>下载当前飞机的纹理：</div>
+                <div>Download textures for current Airplane:</div>
                 <div class="download-fields"></div>
             </div>
             <div id="livery-custom-tab-api" style="display:none;">
               <div>
-                <label for="livery-setting-apikey">在此粘贴您的imgbb API密钥 (<a href="https://api.imgbb.com" target="_blank">获取密钥</a>)</label>
+                <label for="livery-setting-apikey">Paste your imgbb API key here (<a href="https://api.imgbb.com" target="_blank">get key</a>)</label>
                 <input type="text" id="livery-setting-apikey" class="mdl-textfield__input address-input" onchange="LiverySelector.saveSetting(this)">
                 <input type="checkbox" id="livery-setting-remove" onchange="LiverySelector.saveSetting(this)">
-                <label for="livery-setting-remove">一小时后过期链接<br><small>(仅用于测试，提交到数据库时请禁用！)</small></label>
-                <label for="livery-setting-discordid">Discord用户ID (<a href="https://support.discord.com/hc/en-us/articles/206346498" target="_blank">教程</a>)</label>
-                <input type="number" id="livity-setting-discordid" class="mdl-textfield__input address-input" onchange="LiverySelector.saveSetting(this)">
+                <label for="livery-setting-remove">Expire links after one hour<br><small>(only for testing, disable when submitting to the database!)</small></label>
+                <label for="livery-setting-discordid">Discord User ID (<a href="https://support.discord.com/hc/en-us/articles/206346498" target="_blank">howto</a>)</label>
+                <input type="number" id="livery-setting-discordid" class="mdl-textfield__input address-input" onchange="LiverySelector.saveSetting(this)">
               </div>
             </div>
         </div>
         <br/>
-        <a href="https://raw.githubusercontent.com/kolos26/GEOFS-LiverySelector/refs/heads/main/tutorial.txt" target="_blank"><button class="mdl-button mdl-js-button mdl-button--raised mdl-button">打开使用说明</button></a><br/>
-        <a href="https://github.com/kolos26/GEOFS-LiverySelector" target="_blank"><button class="mdl-button mdl-js-button mdl-button--raised mdl-button">访问我们的Github页面</button></a><br/>
-        <a href="mailto:LiverySelector20220816@gmail.com" target="_blank"><button class="mdl-button mdl-js-button mdl-button--raised mdl-button">联系我们：LiverySelector20220816@gmail.com</button></a><br/>
+        <a href="https://raw.githubusercontent.com/kolos26/GEOFS-LiverySelector/refs/heads/main/tutorial.txt" target="_blank"><button class="mdl-button mdl-js-button mdl-button--raised mdl-button">Open tutorial</button></a><br/>
+        <a href="https://discord.gg/2tcdzyYaWU" target="_blank"><button class="mdl-button mdl-js-button mdl-button--raised mdl-button">Join our discord server</button></a><br/>
+        <a href="https://github.com/kolos26/GEOFS-LiverySelector" target="_blank"><button class="mdl-button mdl-js-button mdl-button--raised mdl-button">Visit our Github page</button></a><br/>
+        <a href="mailto:LiverySelector20220816@gmail.com" target="_blank"><button class="mdl-button mdl-js-button mdl-button--raised mdl-button">Contact us: LiverySelector20220816@gmail.com</button></a><br/>
 `;
 }
 
 /**
- * @returns {HTMLElement} 主菜单涂装按钮的HTML模板
+ * @returns {HTMLElement} HTML template for main menu livery button
  */
 function generatePanelButtonHTML() {
     const liveryButton = createTag('button', {
-        title: '选择涂装',
+        title: 'Change livery',
         id: 'liverybutton',
         class: 'mdl-button mdl-js-button geofs-f-standard-ui geofs-mediumScreenOnly',
         onclick: 'LiverySelector.listLiveries()',
@@ -946,7 +957,7 @@ function generatePanelButtonHTML() {
         'data-tooltip-classname': 'mdl-tooltip--top',
         'data-upgraded': ',MaterialButton'
     });
-    liveryButton.innerHTML = createTag('img', { src: `${githubRepo}/liveryselector-logo-small.svg`, height: '30px' }).outerHTML;
+    liveryButton.innerHTML = createTag('img', {src: `${githubRepo}/liveryselector-logo-small.svg`, height: '30px'}).outerHTML;
 
     return liveryButton;
 }
